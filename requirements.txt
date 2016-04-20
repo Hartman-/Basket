@@ -1,1 +1,3 @@
 pypi-publisher
+tinydb
+boto3

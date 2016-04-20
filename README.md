@@ -9,6 +9,8 @@ Overview
 
 The base setup for BasketApp
 
+pip install not working
+
 Installation / Usage
 --------------------
 
