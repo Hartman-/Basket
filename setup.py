@@ -1,29 +1,30 @@
 from setuptools import setup, find_packages
 from codecs import open
-from os import path
+import imp, os
 
-__version__ = '0.0.1'
+version = imp.load_source(
+    'version', os.path.join('basket', 'version.py'))
 
-here = path.abspath(path.dirname(__file__))
+here = os.path.abspath(os.path.dirname(__file__))
 
 # Get the long description from the README file
-with open(path.join(here, 'README.md'), encoding='utf-8') as f:
+with open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 # get the dependencies and installs
-with open(path.join(here, 'requirements.txt'), encoding='utf-8') as f:
+with open(os.path.join(here, 'requirements.txt'), encoding='utf-8') as f:
     all_reqs = f.read().split('\n')
 
 install_requires = [x.strip() for x in all_reqs if 'git+' not in x]
 dependency_links = [x.strip().replace('git+', '') for x in all_reqs if 'git+' not in x]
 
 setup(
-    name='basket',
-    version=__version__,
+    name='Basket',
+    version=version.VERSION_STRING,
     description='The base setup for BasketApp',
     long_description=long_description,
     url='https://github.com/Hartman-/basket',
-    download_url='https://github.com/Hartman-/basket/tarball/' + __version__,
+    download_url='https://github.com/Hartman-/basket/tarball/' + version.VERSION_STRING,
     license='BSD',
     classifiers=[
       'Development Status :: 3 - Alpha',

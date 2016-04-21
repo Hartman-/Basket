@@ -1,4 +1,4 @@
-BasketBase
+Basket
 ===============================
 
 version number: 0.0.1
@@ -7,7 +7,7 @@ author: Ian Hartman
 Overview
 --------
 
-The base setup for BasketApp
+The base setup for Basket
 
 pip install not working
 
