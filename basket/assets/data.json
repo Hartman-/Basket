@@ -1,0 +1,10 @@
+{"shots":{
+  "010": {
+    "last_user": "imh29",
+    "models": [],
+    "scripts": ["BSKP_imh29_Comp_s_010_v0001.nk"],
+    "sequences": ["BSKP_imageSequence_v0001.0001.txt"],
+    "utils": [],
+    "version": 1
+  }
+}}

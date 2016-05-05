@@ -7,7 +7,9 @@ author: Ian Hartman
 Overview
 --------
 
-The base setup for Basket
+Put all your Fruits into one Basket!
+
+Simple project management that makes it easy to keep your team on track and up to date.
 
 pip install not working
 
