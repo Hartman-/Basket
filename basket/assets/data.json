@@ -3,7 +3,7 @@
     "last_user": "imh29",
     "models": [],
     "scripts": ["BSKP_imh29_Comp_s_010_v0001.nk"],
-    "sequences": ["BSKP_imageSequence_v0001.0001.txt"],
+    "sequences": ["BSKP_imageSequence_v0001.####.txt_FR[1-3]"],
     "utils": [],
     "version": 1
   }
