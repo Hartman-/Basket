@@ -125,7 +125,6 @@ test = Transfer(str(cfg.__project_dir__), str(cfg.__local_dir__))
 test.getShotFiles()
 test.createLocalCopy()
 
-
 # === === === === === === === === === === === === === === === === === === === === === === === === === === === === === ===
 # A PORTION OF THE CODE THANKS TO ideasman42
 # Taken from http://blender.stackexchange.com/questions/21092/how-to-get-all-images-for-an-image-sequence-from-python

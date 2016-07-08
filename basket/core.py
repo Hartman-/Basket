@@ -17,6 +17,3 @@ import config as cfg
 from utils import filetransfer as ft
 
 root, dirs, files = os.walk(cfg.__project_dir__).next()
-
-ft.enforce_name(root, dirs, files)
-ft.main(cfg.__project_dir__, cfg.__local_dir__)
