@@ -1,3 +1,4 @@
 pypi-publisher
 tinydb
 boto3
+PySide
