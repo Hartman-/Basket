@@ -5,9 +5,11 @@ import sys, os
 from PySide.QtCore import *
 from PySide.QtGui import *
 
-from utils import SetupProj
 
 class Form(QDialog):
+
+    btnpressed = Signal(str, str)
+
     def __init__(self, parent=None):
         super(Form, self).__init__(parent)
 
@@ -34,23 +36,9 @@ class Form(QDialog):
         self.setLayout(layout)
 
         # Add submitbtn signal
-        self.submitbtn.clicked.connect(self.createfolders)
+        self.submitbtn.clicked.connect(self.pressbtn)
 
-    def createfolders(self):
-        print (self.sceneName.text())
-        print (self.shotName.text())
-        folder = SetupProj.FolderBuilder()
-        folder.createdir(self.sceneName.text(), self.shotName.text())
+    def pressbtn(self):
+        self.btnpressed.emit(self.sceneName.text(), self.shotName.text())
         self.sceneName.clear()
         self.shotName.clear()
-
-
-if __name__ == '__main__':
-    # Create the Qt Application
-    app = QApplication(sys.argv)
-    # Create and show the form
-    form = Form()
-    form.setWindowTitle('Folder Creator')
-    form.show()
-    # Run the main Qt loop
-    sys.exit(app.exec_())

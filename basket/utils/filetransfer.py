@@ -14,6 +14,7 @@ import config as cfg
 proj_dir = str(cfg.__project_dir__)
 img_dir = "01. Plates\\"
 
+
 class Transfer():
     def __init__(self, proj_dir, local_dir):
         self.shot_file_db = TinyDB('C:\\Users\\IanHartman\\Basket-App\\basket\\assets\\shot_file_db.json')

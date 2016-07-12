@@ -1,7 +1,12 @@
 #!/usr/bin/python
 # -'''- coding: utf-8 -'''-
 
-import os
+import os, sys
+from PySide.QtCore import *
+from PySide.QtGui import *
+
+import Pinapple
+
 
 class FolderBuilder:
     def __init__(self):
@@ -19,6 +24,7 @@ class FolderBuilder:
         newdir = base_dir + self.scene + '\\' + self.shot
         self.newdir = newdir
 
+    @Slot(str, str)
     def createdir(self, sc, sh):
         self.scene = sc
         self.shot = sh
@@ -27,3 +33,17 @@ class FolderBuilder:
             self.builddir(d)
             if not os.path.exists(self.newdir):
                 os.makedirs(self.newdir)
+
+if __name__ == '__main__':
+    # Create the Qt Application
+    app = QApplication(sys.argv)
+    # Create and show the form
+    form = Pinapple.Form()
+    form.setWindowTitle('Folder Creator')
+    form.show()
+
+    a = FolderBuilder()
+
+    form.btnpressed.connect(a.createdir)
+    # Run the main Qt loop
+    sys.exit(app.exec_())
