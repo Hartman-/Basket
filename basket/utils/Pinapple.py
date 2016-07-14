@@ -1,11 +1,13 @@
 #!/usr/bin/python
 # -'''- coding: utf-8 -'''-
 
-import os, sys
+import os
+import sys
+
 from PySide.QtCore import *
 from PySide.QtGui import *
 
-from basket import Pinapple
+from basket.gui import FolderBuild_Dialog
 
 
 class FolderBuilder:
@@ -54,7 +56,7 @@ if __name__ == '__main__':
     # Create the Qt Application
     app = QApplication(sys.argv)
     # Create and show the form
-    form = Pinapple.Form()
+    form = FolderBuild_Dialog.Form()
     form.setWindowTitle('Folder Creator')
     form.show()
 
