@@ -33,8 +33,9 @@ class FolderBuilder:
         newdir = base_dir + self.scene + '\\' + self.shot + '\\' + sub_dir
         self.newdir = newdir
 
-    @Slot(str, str)
-    def createdir(self, sc, sh):
+    @Slot(str, str, str)
+    def createdir(self, path, sc, sh):
+        self.setdirectory(path)
         self.scene = sc
         self.shot = sh
 
@@ -45,8 +46,8 @@ class FolderBuilder:
                     os.makedirs(self.newdir)
 
     @Slot(str)
-    def setdirectory(self, string):
-        self.project_directory = string
+    def setdirectory(self, path):
+        self.project_directory = path
         self.updatedirectories()
 
 if __name__ == '__main__':
