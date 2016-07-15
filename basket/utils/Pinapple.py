@@ -7,7 +7,7 @@ import sys
 from PySide.QtCore import *
 from PySide.QtGui import *
 
-from basket.gui import FolderBuild_Dialog
+from basket.gui import FolderBuild_ui
 
 
 class FolderBuilder:
@@ -56,7 +56,7 @@ if __name__ == '__main__':
     # Create the Qt Application
     app = QApplication(sys.argv)
     # Create and show the form
-    form = FolderBuild_Dialog.Form()
+    form = FolderBuild_ui.Form()
     form.setWindowTitle('Folder Creator')
     form.show()
 
