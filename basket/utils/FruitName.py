@@ -6,6 +6,7 @@ import subprocess
 from PySide.QtCore import *
 from PySide.QtGui import *
 
+
 from basket.gui import Launcher_ui
 
 class FruitName:
@@ -13,7 +14,8 @@ class FruitName:
         print ("hello world")
 
     def launchnuke(self):
-        print ("nuke")
+        path = self.buildpath('\\Program Files\\Nuke9.0v8\\Nuke9.0.exe')
+        subprocess.Popen([path, '--nukex'])
 
     def launchmaya(self):
         path = self.buildpath('\\Program Files\\Autodesk\\Maya2016\\bin\\maya.exe')
