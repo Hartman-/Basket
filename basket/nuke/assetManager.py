@@ -6,7 +6,10 @@
 # set the project to the local directory
 
 import sys, os, re
+from basket.utils import Pinapple
+from glob import glob
 import nuke
+import nukescripts
 
 from PySide.QtCore import *
 from PySide.QtGui import *
@@ -22,9 +25,13 @@ class Environment:
     def rootDir(self, user):
         return 'C:\\Users\\' + str(user) + '\\Desktop\\LAW\\'
 
+    def getNukeScripts(self):
+        nkFiles = glob(os.path.join(self.nukeDir(), '*.nk'))
+        return nkFiles
+
     def nukeDir(self):
         curDir = os.path.join(self.rootDir('IanHartman'), os.getenv('SHOW'), 'Working', os.getenv('SEQ'), os.getenv('SHOT'), '07. Comp')
-        if not os.path.isdir( curDir ):
+        if not os.path.isdir(curDir):
             raise ValueError, 'NUKE Directory does not exist'
         return curDir
 
@@ -44,7 +51,6 @@ class Environment:
 class HManager:
     def __init__(self):
         self.env = Environment()
-        self.nkDir = self.env.nukeDir()
 
     def easySave(self):
         description = nuke.getInput( 'Script Variable', 'bashComp' ).replace(' ','')
@@ -53,13 +59,14 @@ class HManager:
         version = 1
         while not fileSaved:
             nkName = '%s_%s_%s_%s_v%02d.nk' % ( os.getenv('SHOW'), os.getenv('SEQ'), os.getenv('SHOT'), description, version)
-            nkPath = os.path.join(self.nkDir, nkName)
+            nkPath = os.path.join(Pinapple.getNukeScripts(), nkName)
             if os.path.isfile(nkPath):
                 version += 1
                 continue
             nuke.scriptSaveAs(nkPath)
             fileSaved = True
         return nkPath
+
 
     # CHECK FOR VERSION IN SCRIPT NAME
     def checkScriptName(self):
@@ -70,9 +77,26 @@ class HManager:
         nuke.updateUI()
 
 
-class HGui:
-    def __init__(self):
+class LoaderPanel( nukescripts.PythonPanel ):
+    def __init__(self, nkScripts):
+        nukescripts.PythonPanel.__init__( self, 'Open Nuke Script')
+        self.checkboxes = []
+        self.nkScripts = nkScripts
 
+        for i, n in enumerate (self.nkScripts):
+            k = nuke.Boolean_Knob('nk_%s' % i, os.path.basename(n))
+            self.addKnob(k)
+            k.setFlag(nuke.STARTLINE)
+            self.checkboxes.append(k)
+
+    def knobChanged(self,knob):
+        if knob in self.checkboxes:
+            for cb in self.checkboxes:
+                if knob == cb:
+                    index = int( knob.name().split('_')[-1])
+                    self.selectedScript = self.nkScripts[index]
+                    continue
+                cb.setValue(False)
 
 
 class LocalizeFiles:
@@ -178,9 +202,9 @@ class FolderBuilder:
 #
 # ---
 
-if __name__ == '__main__':
-    # form = Form()
-    # form.setWindowTitle('Test')
-    # form.show()
-
-    test = LocalizeFiles()
+# if __name__ == '__main__':
+#     # form = Form()
+#     # form.setWindowTitle('Test')
+#     # form.show()
+#
+#     test = LocalizeFiles()

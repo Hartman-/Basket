@@ -3,11 +3,34 @@
 
 import os
 import sys
+from glob import glob
 
 from PySide.QtCore import *
 from PySide.QtGui import *
 
 from basket.gui import FolderBuild_ui
+
+
+# DEFINE EXAMPLE ENVIRONMENT
+os.environ['SHOW'] = 'PROJ_local'
+os.environ['SEQ'] = 'xyz'
+os.environ['SHOT'] = '010'
+
+
+def rootDir(user):
+    return 'C:\\Users\\' + str(user) + '\\Desktop\\LAW\\'
+
+
+def getNukeScripts():
+    nkFiles = glob(os.path.join(nukeDir(), '*.nk'))
+    return nkFiles
+
+
+def nukeDir():
+    curDir = os.path.join(rootDir('IanHartman'), os.getenv('SHOW'), 'Working', os.getenv('SEQ'), os.getenv('SHOT'), '07. Comp')
+    if not os.path.isdir(curDir):
+        raise ValueError, 'NUKE Directory does not exist'
+    return curDir
 
 
 class FolderBuilder:
