@@ -6,13 +6,17 @@ import subprocess
 from PySide.QtCore import *
 from PySide.QtGui import *
 
+from basket import config
+
 from basket.gui import Launcher_ui
 from basket.utils import Pinapple
 from basket.gui import FileSelector
 
+
 class FruitName:
     def __init__(self):
-        print ("hello world")
+        self.needavar = False
+        print(os.path.abspath(os.sep))
 
     @Slot(str)
     def launchnuke(self, filepath):
@@ -41,7 +45,7 @@ if __name__ == '__main__':
     gui.setWindowTitle('VFX Launcher')
     gui.show()
 
-    nukeFile_gui = FileSelector.Form(Pinapple.getNukeScripts())
+    nukeFile_gui = FileSelector.Form(config.getNukeScripts())
     nukeFile_gui.setWindowTitle('Test')
 
     program = FruitName()

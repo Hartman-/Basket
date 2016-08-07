@@ -8,41 +8,21 @@ from glob import glob
 from PySide.QtCore import *
 from PySide.QtGui import *
 
+from basket import config
+
 from basket.gui import FolderBuild_ui
-
-
-# DEFINE EXAMPLE ENVIRONMENT
-os.environ['SHOW'] = 'PROJ_local'
-os.environ['SEQ'] = 'xyz'
-os.environ['SHOT'] = '010'
-
-
-def rootDir(user):
-    return 'C:\\Users\\' + str(user) + '\\Desktop\\LAW\\'
-
-
-def getNukeScripts():
-    nkFiles = glob(os.path.join(nukeDir(), '*.nk'))
-    return nkFiles
-
-
-def nukeDir():
-    curDir = os.path.join(rootDir('IanHartman'), os.getenv('SHOW'), 'Working', os.getenv('SEQ'), os.getenv('SHOT'), '07. Comp')
-    if not os.path.isdir(curDir):
-        raise ValueError, 'NUKE Directory does not exist'
-    return curDir
 
 
 class FolderBuilder:
     def __init__(self):
         self.newdir = 'C:\\Users\\jszot.BKLYNDIGI\\Desktop\\PROJ-proj\\'
 
-        self.project_directory = 'C:\\Users\\Ian\\Desktop\\PROJ-proj\\'
+        self.project_directory = config.rootDir() + 'PROJ_local\\'
 
         self.publish_dir = self.project_directory + 'Publish\\'
         self.working_dir = self.project_directory + 'Working\\'
 
-        self.subdirs = ['a_Layout', 'b_Animation', 'c_Lighting', 'd_Render']
+        self.subdirs = ['01. PreVis', '02. Layout', '03. Anim', '04. FX', '05. Lighting', '06. Render', '07. Comp', '08. Edit']
 
         self.alldirs = [self.publish_dir, self.working_dir]
 

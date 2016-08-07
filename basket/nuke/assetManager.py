@@ -1,56 +1,21 @@
 #!/usr/bin/python
 # -'''- coding: utf-8 -'''-
 
-# Run script in NUKE
-
-# set the project to the local directory
-
 import sys, os, re
 from basket.utils import Pinapple
 from glob import glob
 import nuke
 import nukescripts
 
+from basket import config
+
 from PySide.QtCore import *
 from PySide.QtGui import *
-
-class Environment:
-    def __init__(self):
-
-        # DEFINE EXAMPLE ENVIRONMENT
-        os.environ['SHOW'] = 'PROJ_local'
-        os.environ['SEQ'] = 'xyz'
-        os.environ['SHOT'] = '010'
-
-    def rootDir(self, user):
-        return 'C:\\Users\\' + str(user) + '\\Desktop\\LAW\\'
-
-    def getNukeScripts(self):
-        nkFiles = glob(os.path.join(self.nukeDir(), '*.nk'))
-        return nkFiles
-
-    def nukeDir(self):
-        curDir = os.path.join(self.rootDir('IanHartman'), os.getenv('SHOW'), 'Working', os.getenv('SEQ'), os.getenv('SHOT'), '07. Comp')
-        if not os.path.isdir(curDir):
-            raise ValueError, 'NUKE Directory does not exist'
-        return curDir
-
-    # SET SHOW ENV VARIABLE
-    def setShow(self, show):
-        os.environ['SHOW'] = str(show)
-
-    # SET SEQ ENV VARIABLE
-    def setSeq(self, seq):
-        os.environ['SEQ'] = str(seq)
-
-    # SET SHOT ENV VARIABLE
-    def setShot(self, shot):
-        os.environ['SHOT'] = str(shot)
 
 
 class HManager:
     def __init__(self):
-        self.env = Environment()
+        print('helpme')
 
     def easySave(self):
         description = nuke.getInput( 'Script Variable', 'bashComp' ).replace(' ','')
@@ -59,7 +24,7 @@ class HManager:
         version = 1
         while not fileSaved:
             nkName = '%s_%s_%s_%s_v%02d.nk' % ( os.getenv('SHOW'), os.getenv('SEQ'), os.getenv('SHOT'), description, version)
-            nkPath = os.path.join(Pinapple.getNukeScripts(), nkName)
+            nkPath = os.path.join(config.getNukeScripts(), nkName)
             if os.path.isfile(nkPath):
                 version += 1
                 continue
@@ -97,6 +62,12 @@ class LoaderPanel( nukescripts.PythonPanel ):
                     self.selectedScript = self.nkScripts[index]
                     continue
                 cb.setValue(False)
+
+
+
+
+
+
 
 
 class LocalizeFiles:

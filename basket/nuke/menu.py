@@ -1,5 +1,5 @@
+from basket import config
 import assetManager
-proj_Environment = assetManager.Environment()
 proj_Manager = assetManager.HManager()
 
 shotMenu = '%s - %s' % ( os.getenv( 'SEQ' ), os.getenv('SHOT') )
@@ -15,8 +15,8 @@ def setProject():
 
   ret = panel.show()
 
-  proj_Environment.setSeq(panel.value('Scene'))
-  proj_Environment.setShot(panel.value('Shot'))
+  config.setSeq(panel.value('Scene'))
+  config.setShot(panel.value('Shot'))
   refreshUI(prevProj)
 
 
@@ -24,7 +24,7 @@ def createUI(name):
   nuke.menu('Nuke').addCommand(name + '/Easy Save', proj_Manager.easySave)
   nuke.addFavoriteDir(
     name='NUKE Scripts',
-    directory=proj_Environment.nukeDir(),
+    directory=config.nukeDir(),
     type=nuke.SCRIPT)
 
 
@@ -43,7 +43,7 @@ nuke.addOnScriptSave(proj_Manager.checkScriptName)
 
 
 def nkPanelHelper(key):
-    nkScripts = proj_Manager.getNukeScripts()
+    nkScripts = config.getNukeScripts()
     if not nkScripts:
         return
     p = assetManager.LoaderPanel(nkScripts)
