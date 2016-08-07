@@ -11,13 +11,13 @@ class Form(QDialog):
 
     launch = Signal(str)
 
-    def __init__(self, nkScripts, parent=None):
+    def __init__(self, parent=None):
         super(Form, self).__init__(parent)
 
-        self.nkScripts = nkScripts
+        self.nkScripts = config.getNukeScripts()
 
         self.label = QLabel('Directory...')
-        self.selector = QComboBox()
+        self.select_script = QComboBox()
         self.launchbtn = QPushButton('Launch')
 
         self.label_shot = QLabel('Shot')
@@ -38,7 +38,7 @@ class Form(QDialog):
 
         vbox_select = QVBoxLayout()
         vbox_select.addWidget(self.label)
-        vbox_select.addWidget(self.selector)
+        vbox_select.addWidget(self.select_script)
         vbox_select.addWidget(self.launchbtn)
 
         vbox = QVBoxLayout()
@@ -48,29 +48,38 @@ class Form(QDialog):
 
         self.setLayout(vbox)
 
-        self.select_scene.currentIndexChanged.connect(self.updateShotList)
-
         for i, n in enumerate (self.nkScripts):
-            print('nk_%s' % i, os.path.basename(n))
             self.label.setText(os.path.dirname(n))
-            self.selector.addItem(os.path.basename(n))
+            self.select_script.addItem(os.path.basename(n))
 
         for i_scene, d_scene in enumerate (next(os.walk(os.path.join(config.rootDir(), os.getenv('SHOW'), 'Working')))[1]):
-            print(os.path.join(config.rootDir(), os.getenv('SHOW'), 'Working'))
             self.select_scene.addItem(d_scene)
+            if d_scene == os.getenv('SEQ'):
+                self.select_scene.setCurrentIndex(i_scene)
 
         for i_shot, d_shot in enumerate (next(os.walk(os.path.join(config.rootDir(), os.getenv('SHOW'), 'Working', os.getenv('SEQ'))))[1]):
             self.select_shot.addItem(d_shot)
 
+        self.select_scene.currentIndexChanged.connect(self.updateShotList)
+        self.select_shot.currentIndexChanged.connect(self.updateEnv)
         self.launchbtn.clicked.connect(self.emitlaunch)
 
     def emitlaunch(self):
-        self.launch.emit(os.path.join(self.label.text(), self.selector.itemText(self.selector.currentIndex())))
+        self.launch.emit(os.path.join(self.label.text(), self.select_script.currentText()))
+
+    def updateEnv(self):
+        config.setShot(self.select_shot.currentText())
 
     def updateShotList(self):
-        print('Text Edited')
         self.select_shot.clear()
-        config.setSeq(self.select_scene.itemText(self.select_scene.currentIndex()))
+        config.setSeq(self.select_scene.currentText())
         for i_shot, d_shot in enumerate (next(os.walk(os.path.join(config.rootDir(), os.getenv('SHOW'), 'Working', os.getenv('SEQ'))))[1]):
             self.select_shot.addItem(d_shot)
 
+        self.updateScriptList()
+
+    def updateScriptList(self):
+        self.select_script.clear()
+        for i, n in enumerate (config.getNukeScripts()):
+            self.label.setText(os.path.dirname(n))
+            self.select_script.addItem(os.path.basename(n))

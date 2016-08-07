@@ -16,7 +16,6 @@ from basket.gui import FileSelector
 class FruitName:
     def __init__(self):
         self.needavar = False
-        print(os.path.abspath(os.sep))
 
     @Slot(str)
     def launchnuke(self, filepath):
@@ -40,12 +39,13 @@ if __name__ == '__main__':
     # Create the Qt Application
     app = QApplication(sys.argv)
     # Create and show the form
+    config.setupSession()
 
     gui = Launcher_ui.Launcher()
     gui.setWindowTitle('VFX Launcher')
     gui.show()
 
-    nukeFile_gui = FileSelector.Form(config.getNukeScripts())
+    nukeFile_gui = FileSelector.Form()
     nukeFile_gui.setWindowTitle('Test')
 
     program = FruitName()

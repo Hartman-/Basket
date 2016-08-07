@@ -17,10 +17,11 @@ __shot_version__ = 1
 __cur_user__ = 'imh29'
 
 
-# DEFINE EXAMPLE ENVIRONMENT
-os.environ['SHOW'] = 'PROJ_local'
-os.environ['SEQ'] = 'xyz'
-os.environ['SHOT'] = '010'
+def setupSession():
+    # DEFINE EXAMPLE ENVIRONMENT
+    os.environ['SHOW'] = 'PROJ_local'
+    os.environ['SEQ'] = 'xyz'
+    os.environ['SHOT'] = '010'
 
 
 def rootDir():
