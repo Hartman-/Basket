@@ -7,5 +7,5 @@ setup(name='basket',
       author='Hartman-',
       author_email='imh29@drexel.edu',
       license='MIT',
-      packages=['basket'],
+      packages=['basket', 'basket.gui', 'basket.utils'],
       zip_safe=False)

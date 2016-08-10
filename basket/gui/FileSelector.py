@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -'''- coding: utf-8 -'''-
 
-import sys, os
+import os
 from PySide.QtCore import *
 from PySide.QtGui import *
 
@@ -37,7 +37,7 @@ class Form(QDialog):
         hbox_shot.addWidget(self.select_shot)
 
         vbox_select = QVBoxLayout()
-        vbox_select.addWidget(self.label)
+        # vbox_select.addWidget(self.label)
         vbox_select.addWidget(self.select_script)
         vbox_select.addWidget(self.launchbtn)
 

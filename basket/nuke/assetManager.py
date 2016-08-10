@@ -1,9 +1,7 @@
 #!/usr/bin/python
 # -'''- coding: utf-8 -'''-
 
-import sys, os, re
-from basket.utils import Pinapple
-from glob import glob
+import os, re
 import nuke
 import nukescripts
 

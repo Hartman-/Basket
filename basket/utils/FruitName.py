@@ -9,7 +9,6 @@ from PySide.QtGui import *
 from basket import config
 
 from basket.gui import Launcher_ui
-from basket.utils import Pinapple
 from basket.gui import FileSelector
 
 
@@ -46,7 +45,7 @@ if __name__ == '__main__':
     gui.show()
 
     nukeFile_gui = FileSelector.Form()
-    nukeFile_gui.setWindowTitle('Test')
+    nukeFile_gui.setWindowTitle('NUKE Shot Launcher')
 
     program = FruitName()
 
