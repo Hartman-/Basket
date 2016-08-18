@@ -2,12 +2,14 @@ Basket
 ===============================
 
 version number: 0.0.1
+
 author: Ian Hartman
 
 Requirements
 ------------
 
 Python 2.7
+
 _Currently_ : PyQt + PySide (want to add commandline usablility in case these aren't installed ... aka they won't be)
 
 Overview
