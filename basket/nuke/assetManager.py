@@ -39,6 +39,17 @@ class HManager:
     def refreshUI(self):
         nuke.updateUI()
 
+    def localizeRead(self):
+        selectedNodes = nuke.SelectedNodes()
+
+        # Double check that only write nodes were selected
+        for i, node in enumerate (selectedNodes):
+            if not node.Class() == 'write':
+                selectedNodes.pop(i)
+
+        # Set each write node to the appropriate local directory
+        node.knob('proxy').setValue(self.local_seq)
+
 
 class LoaderPanel( nukescripts.PythonPanel ):
     def __init__(self, nkScripts):

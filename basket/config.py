@@ -28,6 +28,10 @@ def rootDir():
     return os.path.expanduser('~') + '\\Desktop\\LAW\\'
 
 
+def serverDir():
+    return os.path.expanduser('~') + '\\Desktop\\LAW_server'
+
+
 def getNukeScripts():
     nkFiles = glob(os.path.join(nukeDir(), '*.nk'))
     return nkFiles
@@ -40,13 +44,22 @@ def nukeDir():
     return curDir
 
 
+def seqDir():
+    curDir = os.path.join(rootDir(), os.getenv('SHOW'), 'Frames', os.getenv('SEQ'), os.getenv('SHOT'), 'src')
+    if not os.path.isdir(curDir):
+        raise ValueError, 'Frames Directory does not exist'
+    return curDir
+
+
 # SET SHOW ENV VARIABLE
 def setShow(show):
     os.environ['SHOW'] = str(show)
 
+
 # SET SEQ ENV VARIABLE
 def setSeq(seq):
     os.environ['SEQ'] = str(seq)
+
 
 # SET SHOT ENV VARIABLE
 def setShot(shot):
