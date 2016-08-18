@@ -4,14 +4,20 @@ Basket
 version number: 0.0.1
 author: Ian Hartman
 
+Requirements
+------------
+
+Python 2.7
+_Currently_ : PyQt + PySide (want to add commandline usablility in case these aren't installed ... aka they won't be)
+
 Overview
 --------
 
 Put all your Fruits into one Basket!
 
-Simple project management that makes it easy to keep your team on track and up to date.
+Basket aims to make organizing my capstone project more manageable. Offering wrappers for NUKE and Maya, Basket will be able to keep the team working efficiently with smart file read, smart file write, folder & file localization, and more! ... (exciting, I know)
 
-pip install not working
+pip install not working, just don't even try. I think there is already an app up there called Basket anyway... Plus, I don't think that will be necessary but maybe... 
 
 Installation / Usage
 --------------------
@@ -29,7 +35,7 @@ Or clone the repo:
 Contributing
 ------------
 
-TBD
+Ian Hartman
 
 Example
 -------
