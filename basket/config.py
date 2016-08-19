@@ -38,14 +38,14 @@ def getNukeScripts():
 
 
 def nukeDir():
-    curDir = os.path.join(rootDir(), os.getenv('SHOW'), 'Working', os.getenv('SEQ'), os.getenv('SHOT'), '07. Comp')
+    curDir = os.path.join(serverDir(), os.getenv('SHOW'), 'Working', os.getenv('SEQ'), os.getenv('SHOT'), '07. Comp')
     if not os.path.isdir(curDir):
         raise ValueError, 'NUKE Directory does not exist'
     return curDir
 
 
 def seqDir():
-    curDir = os.path.join(rootDir(), os.getenv('SHOW'), 'Frames', os.getenv('SEQ'), os.getenv('SHOT'), 'src')
+    curDir = os.path.join(serverDir(), os.getenv('SHOW'), 'Frames', os.getenv('SEQ'), os.getenv('SHOT'), 'src')
     if not os.path.isdir(curDir):
         raise ValueError, 'Frames Directory does not exist'
     return curDir

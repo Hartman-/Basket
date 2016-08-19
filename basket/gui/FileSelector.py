@@ -52,12 +52,12 @@ class Form(QDialog):
             self.label.setText(os.path.dirname(n))
             self.select_script.addItem(os.path.basename(n))
 
-        for i_scene, d_scene in enumerate (next(os.walk(os.path.join(config.rootDir(), os.getenv('SHOW'), 'Working')))[1]):
+        for i_scene, d_scene in enumerate (next(os.walk(os.path.join(config.serverDir(), os.getenv('SHOW'), 'Working')))[1]):
             self.select_scene.addItem(d_scene)
             if d_scene == os.getenv('SEQ'):
                 self.select_scene.setCurrentIndex(i_scene)
 
-        for i_shot, d_shot in enumerate (next(os.walk(os.path.join(config.rootDir(), os.getenv('SHOW'), 'Working', os.getenv('SEQ'))))[1]):
+        for i_shot, d_shot in enumerate (next(os.walk(os.path.join(config.serverDir(), os.getenv('SHOW'), 'Working', os.getenv('SEQ'))))[1]):
             self.select_shot.addItem(d_shot)
 
         self.select_scene.currentIndexChanged.connect(self.updateShotList)

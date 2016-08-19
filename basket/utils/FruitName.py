@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -'''- coding: utf-8 -'''-
 
-import sys, os
+import sys, os, time
 import subprocess
 import shutil
 from PySide.QtCore import *
@@ -101,13 +101,22 @@ class LocalProject:
                 os.path.join(local_root, 'frames'),
                 ignore=self.ignore_files)
 
-def nukeLauncher():
-    nukeFile_gui = FileSelector.Form()
-    nukeFile_gui.setWindowTitle('NUKE Shot Launcher')
-    nukeFile_gui.show
 
-    main_launcher = FruitName()
-    nukeFile_gui.launch.connect(main_launcher.launchnuke)
+    ''' PROBABLY NEVER GOING TO GET USED
+        MOVING TO A NUKE BASED SOLUTION WHERE THE ASSETMANAGER SAVES THE NUKE SCRIPT POST OPEN '''
+    def copyserverfile(self, filename):
+        server_file = os.path.join(config.serverDir(), os.getenv('SHOW'), 'working', os.getenv('SEQ'), os.getenv('SHOT'), '07. Comp', filename)
+        local_dir = os.path.join(config.rootDir(), os.getenv('SHOW'), 'working', os.getenv('SEQ'), os.getenv('SHOT'), '07. Comp')
+
+        shutil.copy2(server_file, local_dir)
+        while not os.path.exists(os.path.join(local_dir, filename)):
+            time.sleep(1)
+            print('l')
+            if os.path.isfile(os.path.join(local_dir, filename)):
+                print('fuck you')
+            else:
+                raise ValueError('File does not Exist!')
+
 
 if __name__ == '__main__':
     # Create the Qt Application
@@ -119,9 +128,13 @@ if __name__ == '__main__':
     gui.setWindowTitle('LAW Launcher')
     gui.show()
 
+    nukeFile_gui = FileSelector.Form()
+    nukeFile_gui.setWindowTitle('NUKE Shot Launcher')
+
     program = FruitName()
 
-    gui.nukepressed.connect(nukeLauncher)
+    gui.nukepressed.connect(nukeFile_gui.show)
     gui.mayapressed.connect(program.launchmaya)
+    nukeFile_gui.launch.connect(program.launchnuke)
 
     sys.exit(app.exec_())
