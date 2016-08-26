@@ -6,7 +6,7 @@ import getpass
 import nuke
 import nukescripts
 
-from basket import config
+import BasketGlobals as config
 
 from PySide.QtCore import *
 from PySide.QtGui import *

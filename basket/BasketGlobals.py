@@ -1,6 +1,7 @@
-# !/usr/bin/env python
+#!/usr/bin/env python
 
 import os
+import platform
 from glob import glob
 
 # Configure Necessary Global Variables for Basket
@@ -10,6 +11,11 @@ def setupSession():
     os.environ['SHOW'] = 'PROJ_local'
     os.environ['SEQ'] = 'xyz'
     os.environ['SHOT'] = '010'
+
+
+def curOS():
+    currentOS = platform.system()
+    return currentOS
 
 
 def rootDir():
@@ -29,6 +35,16 @@ def nukeDir():
     curDir = os.path.join(serverDir(), os.getenv('SHOW'), 'Working', os.getenv('SEQ'), os.getenv('SHOT'), '07. Comp')
     if not os.path.isdir(curDir):
         raise ValueError, 'NUKE Directory does not exist'
+    return curDir
+
+
+def stageDir(stage):
+    stages = ['01. PreVis', '02. Layout', '03. Anim', '04. FX', '05. Lighting', '06. Render', '07. Comp', '08. Edit']
+    baseDir = os.path.join(serverDir(), os.getenv('SHOW'), 'Working', os.getenv('SEQ'), os.getenv('SHOT'))
+    # Thanks for starting at Zero lists!
+    curDir = os.path.join(baseDir, stages[stage - 1])
+    if not os.path.isdir(curDir):
+        raise ValueError, 'File Directory does not exist'
     return curDir
 
 
@@ -52,3 +68,6 @@ def setSeq(seq):
 # SET SHOT ENV VARIABLE
 def setShot(shot):
     os.environ['SHOT'] = str(shot)
+
+if __name__ == '__main__':
+    print 'hello'
