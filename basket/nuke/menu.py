@@ -1,5 +1,8 @@
+import re
+
 import BasketGlobals as config
 import assetManager
+import autowrite
 proj_Manager = assetManager.HManager()
 
 
@@ -53,11 +56,13 @@ nuke.addOnScriptSave(proj_Manager.checkScriptName)
 setupMenu()
 
 def savelocalscript():
-    print('fuck you da bitch')
     if not os.path.isdir(config.nukeDir()):
         print('what do?')
     else:
-        proj_Manager.s_easySave('testMyAsshole')
+        nkName = os.path.basename(nuke.root().knob('name').value())
+        desc = nkName.split('_')[2]
+        fileVersion = int(re.search(r'[vV]\d+', os.path.split(nkName)[1]).group().lstrip('vV'))
+        proj_Manager.s_easySave(desc, ver=fileVersion)
 
 # def nkPanelHelper(key):
 #     nkScripts = config.getNukeScripts()

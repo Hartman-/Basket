@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import re
 import os
 import platform
 from glob import glob
@@ -32,7 +33,7 @@ def getNukeScripts():
 
 
 def nukeDir():
-    curDir = os.path.join(serverDir(), os.getenv('SHOW'), 'Working', os.getenv('SEQ'), os.getenv('SHOT'), '07. Comp')
+    curDir = os.path.join(rootDir(), os.getenv('SHOW'), 'Working', os.getenv('SEQ'), os.getenv('SHOT'), '07. Comp')
     if not os.path.isdir(curDir):
         raise ValueError, 'NUKE Directory does not exist'
     return curDir
@@ -70,4 +71,5 @@ def setShot(shot):
     os.environ['SHOT'] = str(shot)
 
 if __name__ == '__main__':
-    print 'hello'
+    print curOS()
+    

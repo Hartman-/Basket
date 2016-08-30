@@ -6,6 +6,8 @@
 # Semi-automatic Write node output paths lead to fewer user errors and greater
 # consistency in file-naming.
 #
+# Updated for pipeline accuracy - Ian Hartman
+#
 
 import nuke
 
@@ -31,9 +33,9 @@ def dropAutoWrite():
     # a less messy file path.
     t = nuke.Tab_Knob("Path Fragments")
     w.addKnob(t)
-    w.addKnob(nuke.EvalString_Knob('proj_root', 'Project Root', '[join [lrange [split [value root.name] / ] 0 4 ] / ]'))
-    w.addKnob(nuke.EvalString_Knob('seq', 'Sequence', '[lrange [split [value root.name] / ] 5 5 ]'))
-    w.addKnob(nuke.EvalString_Knob('shot', 'Shot Name', '[lrange [split [value root.name] / ] 6 6 ]'))
+    w.addKnob(nuke.EvalString_Knob('proj_root', 'Project Root', '[join [lrange [split [value root.name] / ] 0 5 ] / ]'))
+    w.addKnob(nuke.EvalString_Knob('seq', 'Sequence', '[lrange [split [value root.name] / ] 7 7 ]'))
+    w.addKnob(nuke.EvalString_Knob('shot', 'Shot Name', '[lrange [split [value root.name] / ] 8 8 ]'))
     w.addKnob(nuke.EvalString_Knob('script', 'Script Name', '[file rootname [file tail [value root.name] ] ]'))
     
     # Display the values of our path fragment knobs on the node in the DAG for
@@ -50,7 +52,7 @@ def dropAutoWrite():
     w.knob('label').setValue(feedback)
     
     # Re-assemble the path fragments into a proper output path
-    output_path = "[value proj_root]/[value seq]/[value shot]/comps/[value script]/[value input.width]x[value input.height]/[value script].%04d.dpx"
+    output_path = "[value proj_root]/frames/[value seq]/[value shot]/comp/[value script]/[value input.width]x[value input.height]/[value script].%04d.dpx"
     w.knob('file').fromScript(output_path)
 
 

@@ -18,32 +18,36 @@ class Launcher:
         localize = LocalizeProject()
         localize.buildlocal()
 
-    def launchnuke(self, filepath):
-        # Set the path to a default of Windows
-        path = 'C:\\Program Files\\Nuke9.0v8\\Nuke9.0.exe'
-        if config.curOS().lower() is not 'windows':
-            path = 'MacOSPath'
-        p = Popen([path, '--nukex', filepath], stdout=PIPE)
-
-    def launchmaya(self, filepath):
-        pass
-
     def launch(self, appPath, filePath):
         p = subprocess.Popen([appPath, '--nukex', filePath], creationflags=subprocess.CREATE_NEW_CONSOLE)
 
     def applicationpath(self, stage):
-        paths = {
-            0: '',
-            1: '',
-            2: '',
-            3: '',
-            4: '',
-            5: '',
-            6: '',
-            7: 'C:\\Program Files\\Nuke9.0v8\\Nuke9.0.exe',
-            8: ''
-        }
-        return paths[stage]
+        if config.curOS().lower() == 'windows':
+            paths = {
+                0: '',
+                1: '',
+                2: '',
+                3: '',
+                4: '',
+                5: '',
+                6: '',
+                7: 'C:\\Program Files\\Nuke9.0v8\\Nuke9.0.exe',
+                8: ''
+            }
+            return paths[stage]
+        else:
+            paths = {
+                0: '',
+                1: '',
+                2: '',
+                3: '',
+                4: '',
+                5: '',
+                6: '',
+                7: '',
+                8: ''
+            }
+            return paths[stage]
 
     # Get the latest nuke file
     def latestfile(self, stage, tag):
@@ -145,7 +149,16 @@ class LocalizeProject:
 	Run the command line program, parse incoming arguments '''
 def initialize():
     config.setupSession()
-    hehe = Launcher()
+    basketLaunch = Launcher()
+
+    sequence_list = []
+    for i_scene, d_scene in enumerate(next(os.walk(os.path.join(config.serverDir(), os.getenv('SHOW'), 'Working')))[1]):
+        if d_scene[:1] is not "_":
+            sequence_list.append(d_scene)
+
+    shot_list = []
+    for i_shot, d_shot in enumerate(next(os.walk(os.path.join(config.serverDir(), os.getenv('SHOW'), 'Working', os.getenv('SEQ'))))[1]):
+        shot_list.append(d_shot)
 
     # Initialize the command line argument parser
     parser = argparse.ArgumentParser(
@@ -159,11 +172,13 @@ def initialize():
     parser.add_argument("-s", "--seq",
     	required=True, 
     	help="Define the sequence",
-    	type=str)
+    	type=str,
+        choices=sequence_list)
     parser.add_argument("-sh", "--shot",
     	required=True, 
     	help="Define the shot",
-    	type=str)
+    	type=str,
+        choices=shot_list)
     parser.add_argument("-st", "--stage",
         required=True,
     	help="Define the step of the process",
@@ -171,11 +186,6 @@ def initialize():
     parser.add_argument("-t", "--tag",
         help="Define a specific tag to open the most recent file",
         type=str)
-    # parser.add_argument("-a", "--app",
-    # 	required=True,
-    # 	help="Define the application to launch into",
-    # 	type=str,
-    # 	choices=["NUKE", "MAYA"])
 
     # store_true means to receive no arguments, provide callback of TRUE when flag is used
     parser.add_argument("-r", "--render", 
@@ -190,10 +200,13 @@ def initialize():
     config.setSeq(args.seq)
     config.setShot(args.shot)
 
-    hehe.launch(hehe.applicationpath(args.stage), hehe.latestfile(args.stage, args.tag))
+    basketLaunch.launch(
+        basketLaunch.applicationpath(args.stage),
+        basketLaunch.latestfile(args.stage, args.tag)
+    )
 
 
-    # Runs if the file is run directly... NOT imported
+# Runs if the file is run directly... NOT imported
 if __name__ == "__main__":
     initialize()
 

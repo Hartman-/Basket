@@ -19,9 +19,9 @@ class HManager:
         description = nuke.getInput('Script Variable', 'bashComp').replace(' ', '')
         self.s_easySave(description)
 
-    def s_easySave(self, description):
+    def s_easySave(self, description, ver=1):
         fileSaved = False
-        version = 1
+        version = ver
         while not fileSaved:
             nkName = '%s_%s_%s_v%02d_%s_%s.nk' % (os.getenv('SEQ'), os.getenv('SHOT'), description, version, 'comp', getpass.getuser())
             nkPath = os.path.join(config.nukeDir(), nkName)
