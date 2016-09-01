@@ -19,12 +19,12 @@ class HManager:
         description = nuke.getInput('Script Variable', 'bashComp').replace(' ', '')
         self.s_easySave(description)
 
-    def s_easySave(self, description, ver=1):
+    def s_easySave(self, description, server=config.nukeDir(), ver=1):
         fileSaved = False
         version = ver
         while not fileSaved:
             nkName = '%s_%s_%s_v%02d_%s_%s.nk' % (os.getenv('SEQ'), os.getenv('SHOT'), description, version, 'comp', getpass.getuser())
-            nkPath = os.path.join(config.nukeDir(), nkName)
+            nkPath = os.path.join(server, nkName)
             if os.path.isfile(nkPath):
                 version += 1
                 continue
@@ -41,17 +41,38 @@ class HManager:
     def refreshUI(self):
         nuke.updateUI()
 
-    def localizeRead(self):
-        selectedNodes = nuke.SelectedNodes()
 
-        # Double check that only write nodes were selected
-        for i, node in enumerate (selectedNodes):
-            if not node.Class() == 'write':
-                selectedNodes.pop(i)
+def createWriteDirs():
+    tgtDir = os.path.dirname(nuke.filename(nuke.thisNode()))
+    osdir = nuke.callbacks.filenameFilter(tgtDir)
+    if not os.path.isdir(osdir):
+        os.makedirs(osdir)
 
-        # Set each write node to the appropriate local directory
-        node.knob('proxy').setValue(self.local_seq)
 
+def localizeRead():
+    nukeroot = nuke.root()
+
+    # Set the global variables to enable reading a proxy file
+    # Set setting to 'always' to ensure tha the proxy files get read
+    nukeroot.knob('proxy').setValue(True)
+    nukeroot.knob('proxy_type').setValue('format')
+    nukeroot.knob('proxy_format').setValue(nukeroot.format().name())
+    nukeroot.knob('proxySetting').setValue('always')
+
+    # Grab selected nodes in DAG
+    selectedNodes = nuke.selectedNodes()
+
+    # Double check that only read nodes were selected
+    # Pop/Remove them if they aren't
+    for i, node in enumerate (selectedNodes):
+        if not node.Class().lower() == 'read':
+            selectedNodes.pop(i)
+
+    # Set each read node to the appropriate local directory
+    for index, readnode in enumerate (selectedNodes):
+        filename = os.path.basename(readnode.knob('file').value())
+        filepath = os.path.join(config.localFramesDir(), filename)
+        readnode.knob('proxy').setValue(filepath)
 
 # class LoaderPanel( nukescripts.PythonPanel ):
 #     def __init__(self, nkScripts):

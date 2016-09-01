@@ -38,6 +38,11 @@ def nukeDir():
         raise ValueError, 'NUKE Directory does not exist'
     return curDir
 
+def localFramesDir():
+    curDir = os.path.join(serverDir(), os.getenv('SHOW'), 'frames', os.getenv('SEQ'), os.getenv('SHOT'), 'src')
+    if not os.path.isdir(curDir):
+        raise ValueError, 'Frames Directory does not exist'
+    return curDir
 
 def stageDir(stage):
     stages = ['01. PreVis', '02. Layout', '03. Anim', '04. FX', '05. Lighting', '06. Render', '07. Comp', '08. Edit']
@@ -72,4 +77,3 @@ def setShot(shot):
 
 if __name__ == '__main__':
     print curOS()
-    

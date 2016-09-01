@@ -10,6 +10,7 @@
 #
 
 import nuke
+import os
 
 def dropAutoWrite():
     """
@@ -42,7 +43,8 @@ def dropAutoWrite():
     # error-checking.
     # This can be turned off if it makes too much of a mess for your taste.
     feedback = """
-    Output Path: [value file]
+    Output Path: [value file]rfa
+
     
     Project Root: [value proj_root]
     Sequence: [value seq]
@@ -54,6 +56,12 @@ def dropAutoWrite():
     # Re-assemble the path fragments into a proper output path
     output_path = "[value proj_root]/frames/[value seq]/[value shot]/comp/[value script]/[value input.width]x[value input.height]/[value script].%04d.dpx"
     w.knob('file').fromScript(output_path)
+
+    # IH <
+    # Grab the file extension, Set the write nodes file type to expose the extra options
+    file_extension = os.path.splitext(output_path)[1][1:]
+    w.knob('file_type').setValue(file_extension)
+    # > IH
 
 
 # Add an AutoWrite option to the Image menu

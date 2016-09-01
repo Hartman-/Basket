@@ -6,6 +6,10 @@ import autowrite
 proj_Manager = assetManager.HManager()
 
 
+# Add beforeRender script to automatically create write directories that don't exist
+nuke.knobDefault( 'Write.beforeRender', 'assetManager.createWriteDirs()')
+
+
 def checkEnv():
     if os.getenv('SEQ') is None or os.getenv('SHOT') is None or os.getenv('SHOW') is None:
         config.setupSession()
@@ -51,6 +55,7 @@ def refreshUI(prev):
 
 
 nuke.menu('Nuke').addCommand('Manage/Set Project', setProject)
+nuke.menu('Nuke').addCommand('Manage/Localize', assetManager.localizeRead)
 nuke.addOnScriptSave(proj_Manager.checkScriptName)
 
 setupMenu()
@@ -63,6 +68,17 @@ def savelocalscript():
         desc = nkName.split('_')[2]
         fileVersion = int(re.search(r'[vV]\d+', os.path.split(nkName)[1]).group().lstrip('vV'))
         proj_Manager.s_easySave(desc, ver=fileVersion)
+
+def saveserverscript():
+    if not os.path.isdir(config.nukeDir()):
+        print('what do?')
+    else:
+        serverDir = os.path.join(config.serverDir(), os.getenv('SHOW'), 'Working', os.getenv('SEQ'), os.getenv('SHOT'), '07. Comp')
+
+        nkName = os.path.basename(nuke.root().knob('name').value())
+        desc = nkName.split('_')[2]
+        fileVersion = int(re.search(r'[vV]\d+', os.path.split(nkName)[1]).group().lstrip('vV'))
+        proj_Manager.s_easySave(desc, server=serverDir, ver=fileVersion)
 
 # def nkPanelHelper(key):
 #     nkScripts = config.getNukeScripts()
@@ -80,3 +96,4 @@ def savelocalscript():
 
 # nuke.addOnUserCreate(nkPanelHelper, 'newUser', nodeClass='Root')
 nuke.addOnScriptLoad(savelocalscript)
+nuke.addOnScriptClose(saveserverscript)
