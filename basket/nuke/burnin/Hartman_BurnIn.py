@@ -193,19 +193,11 @@ nuke.toNode("BurnIn").knob("disable").setValue(False)
 				self.textNode['box'].setExpression('[python {nuke.toNode("pRect").knob("area").value()[1] + '+ str(self.Box[1]) +'}]', 1)
 				self.textNode['box'].setExpression('[python {nuke.toNode("pRect").knob("area").value()[3] - '+ str(frameHeight - self.Box[3]) +'}]', 3)
 
-
-
-	# Build Controller Node
-	n_groupControls = nuke.createNode('NoOp')
-	n_groupControls['name'].setValue('BurnIn_Controls')
-
 	k_CtrlTab = nuke.Tab_Knob('Controls')
 	k_CtrlAuthor = nuke.String_Knob('author', 'author')
 	k_CtrlAuthor.setValue('Ian Hartman')
 	k_CtrlShotName = nuke.String_Knob('shot', 'shot name')
 	k_CtrlShotName.setValue('Shot01')
-
-	n_groupControls.setInput(0, None)
 
 	# Retime the footage to allow for a Slate
 	# Sets the start of the footage to be the frame 1, slate will be on frame 0

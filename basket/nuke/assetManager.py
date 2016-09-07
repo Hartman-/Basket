@@ -3,6 +3,7 @@
 
 import os, re
 import getpass
+from glob import glob
 import nuke
 import nukescripts
 
@@ -13,7 +14,7 @@ from PySide.QtGui import *
 
 class HManager:
     def __init__(self):
-        print('helpme')
+        pass
 
     def easySave(self):
         description = nuke.getInput('Script Variable', 'bashComp').replace(' ', '')
@@ -70,8 +71,8 @@ def localizeRead():
 
     # Set each read node to the appropriate local directory
     for index, readnode in enumerate (selectedNodes):
-        filename = os.path.basename(readnode.knob('file').value())
-        filepath = os.path.join(config.localFramesDir(), filename)
+        filename = readnode.knob('file').value()
+        filepath = filename.replace(config.serverDir(), config.rootDir())
         readnode.knob('proxy').setValue(filepath)
 
 # class LoaderPanel( nukescripts.PythonPanel ):
@@ -96,50 +97,105 @@ def localizeRead():
 #                 cb.setValue(False)
 
 
+# Foundry File Loader
+# =====
+
+def seqSubDirs(i):
+    base = [ 'plates', 'cg', 'elements' ]
+    set = {
+        0: base,
+        1: base
+    }
+    return set[i]
 
 
+def getVersions():
+    '''Return a dictionary of rendered versions per type'''
+    # DEFINE THE DIRECTORIES YOU WANT TO INCLUDE
+    types = seqSubDirs(0)
+    # INITIALISE THE DICTIONARY WE WILL RETURN AT THE END OF THE FUNCTION
+    versionDict = {}
+    # GET THE DIRECTORY BASED ON THE CURRENT SHOT ENVIRONMENT
+    shotDir = os.path.join( config.serverDir(), os.getenv('SHOW'), 'Frames', os.getenv('SEQ'), os.getenv('SHOT') )
+    # LOOP THROUGH THE FOLDERS INSIDE THE SHOT DIRECTORY AND COLLECT THE IMAGE SEQUENCES THEY CONTAIN
+    for t in types:
+        versionDict[t] = [] # THIS WILL HOLD THE FOUND SEQUENCES
+        typeDir = os.path.join( shotDir, t ) # GET THE CURRENT DIRECTORY PATH
+        for d in os.listdir( typeDir ): # LOOP THROUGH IT'S CONTENTS
+            path = os.path.join( typeDir, d)
+            if os.path.isdir( path ): # LOOP THROUGH SUB DIRECTORIES
+                versionDict[t].append( getFileSeq( path ).replace('\\', '/') ) # RUN THE getFileSeq() FUNCTION AND APPEND IT'S OUTPUT TO THE LIST
+    return versionDict
 
 
+def getFileSeq( dirPath ):
+    '''Return file sequence with same name as the parent directory. Very loose example!!'''
+    dirName = os.path.basename( dirPath )
+    # COLLECT ALL FILES IN THE DIRECTORY THAT HVE THE SAME NAME AS THE DIRECTORY
+    files = glob( os.path.join( dirPath, '%s.*.*' % dirName ) )
+    print files
+    # GRAB THE RIGHT MOST DIGIT IN THE FIRST FRAME'S FILE NAME
+    firstString = re.findall( r'\d+', files[0] )[-1]
+    # GET THE PADDING FROM THE AMOUNT OF DIGITS
+    padding = len( firstString )
+    # CREATE PADDING STRING FRO SEQUENCE NOTATION
+    paddingString = '%02s' % padding
+    # CONVERT TO INTEGER
+    first = int( firstString )
+    # GET LAST FRAME
+    last = int( re.findall( r'\d+', files[-1] )[-1] )
+    # GET EXTENSION
+    ext = os.path.splitext( files[0] )[-1]
+    # BUILD SEQUENCE NOTATION
+    fileName = '%s.%%%sd%s %s-%s' % ( dirName, str(padding).zfill(2), ext, first, last )
+    # RETURN FULL PATH AS SEQUENCE NOTATION
+    return os.path.join( dirPath, fileName )
 
 
-class LocalizeFiles:
-    def __init__(self):
-        # self.nukeroot = nuke.root()
+def createDbKnob():
+    # CREATE USER KNOBS
+    node = nuke.thisNode()
+    tabKnob = nuke.Tab_Knob( 'DB', 'DB' )
+    typeKnob = nuke.Enumeration_Knob( 'versionType', 'type', seqSubDirs(0) )
+    updateKnob = nuke.PyScript_Knob( 'update', 'update' )
+    updateKnob.setValue( 'assetManager.updateDbKnob()' )
+    versionKnob = nuke.Enumeration_Knob( '_version', 'version', [] ) # DO NOT USE "VERSION" AS THE KNOB NAME AS THE READ NODE ALREADY HAS A "VERSION" KNOB
+    loadKnob = nuke.PyScript_Knob( 'load', 'load' )
 
-        self.server_seq = 'Z:\\Users\\Ian\\Desktop\\PROJ_server\\Working\\xyz\\010\\d_Render\\seq\\'
-        self.local_seq = 'Z:/Users/Ian/Desktop/PROJ_local/Working/xyz/010/d_Render/seq/ubercam.%04d.png'
+    # ASSIGN PYTHON SCRIPT AS ONE LARGE STRING
+    loadScript = '''#THIS ASSUMES NO WHITE SPACES IN FILE PATH
+node = nuke.thisNode()
+path, range = node['_version'].value().split()
+first, last = range.split('-')
+node['file'].setValue( path )
+node['first'].setValue( int(first) )
+node['last'].setValue( int(last) )'''
 
-        localexists = self.checkforlocalproject()
-        if localexists[0] == True:
-            if os.path.isdir(localexists[1] + 'Working\\xyz\\010') == False:
-                nuke.scriptSaveAs(filename=localexists[1] + '\\Working\\xyz\\010\\' + 'HelloWorld.nk')
-        else:
-            os.makedirs(localexists[1])
-            nuke.scriptSaveAs(filename=localexists[1] + '\\Working\\xyz\\010\\' + 'HelloWorld.nk')
+    loadKnob.setValue( loadScript )
 
-    def proxylocal(self):
-        self.nukeroot.knob('proxy').setValue(True)
-        self.nukeroot.knob('proxy_type').setValue('format')
-        self.nukeroot.knob('proxy_format').setValue(self.nukeroot.format().name())
-        self.nukeroot.knob('proxySetting').setValue('always')
+    # ADD NEW KNOBS TO NODE
+    for k in ( tabKnob, typeKnob, updateKnob, versionKnob, loadKnob ):
+        node.addKnob( k )
+    # UPDATE THE VERSION KNOB SO IT SHOWS WHAT'S ON DISK / IN THE DATABASE
+    updateDbKnob()
 
-        self.n_read = nuke.toNode('Read1')
-        print(self.n_read.knob('file').getValue())
 
-        self.n_read.knob('proxy').setValue(self.local_seq)
+def updateDbKnob():
+    node = nuke.thisNode()
+    knob = nuke.thisKnob()
 
-    def getlocaldesktop(self):
-        basedrive = 'Z:\\Users\\Ian\\Desktop\\'
-        return basedrive
+    # RUN ONLY IF THE TYPE KNOB CHANGES OR IF THE NODE PANEL IS OPENED
+    if not knob or knob.name() in [ 'versionType', 'showPanel' ]:
+        # GET THE VERSION DICTIONARY
+        versionDict = getVersions()
+        # POPULATE THE VERSION KNOB WITH THE VERSIONS REQUESTED THROUGH THE TYPE KNOB
+        node['_version'].setValues( versionDict[ node['versionType'].value() ] )
+        # SET THE A VALUE TO THE FIRST ITEM IN THE LIST
+        node['_version'].setValue(0)
 
-    def checkforlocalproject(self):
-        desktop = self.getlocaldesktop()
-        localdir = desktop + 'PROJ_local'
 
-        if os.path.isdir(localdir) == True:
-            return [True, localdir]
-        else:
-            return [False, localdir]
+# =====
+
 
 class Form(QDialog):
 

@@ -172,13 +172,11 @@ def initialize():
     parser.add_argument("-s", "--seq",
     	required=True, 
     	help="Define the sequence",
-    	type=str,
-        choices=sequence_list)
+    	type=str)
     parser.add_argument("-sh", "--shot",
     	required=True, 
     	help="Define the shot",
-    	type=str,
-        choices=shot_list)
+    	type=str)
     parser.add_argument("-st", "--stage",
         required=True,
     	help="Define the step of the process",
@@ -209,9 +207,3 @@ def initialize():
 # Runs if the file is run directly... NOT imported
 if __name__ == "__main__":
     initialize()
-
-# NOTES
-
-'''
-- Use 'choices' option on the parser.add_argument to limit the user to the currently established seq/shots in the server directory
-'''

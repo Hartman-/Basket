@@ -2,7 +2,9 @@ import re
 
 import BasketGlobals as config
 import assetManager
+import logging
 import autowrite
+
 proj_Manager = assetManager.HManager()
 
 
@@ -10,14 +12,9 @@ proj_Manager = assetManager.HManager()
 nuke.knobDefault( 'Write.beforeRender', 'assetManager.createWriteDirs()')
 
 
-def checkEnv():
-    if os.getenv('SEQ') is None or os.getenv('SHOT') is None or os.getenv('SHOW') is None:
-        config.setupSession()
-
-
 def setupMenu():
     # If any of the environment variables are missing, set the basics
-    checkEnv()
+    config.checkEnv()
     shotMenu = '%s - %s' % (os.getenv('SEQ'), os.getenv('SHOT'))
     createUI(shotMenu)
 
@@ -58,6 +55,23 @@ nuke.menu('Nuke').addCommand('Manage/Set Project', setProject)
 nuke.menu('Nuke').addCommand('Manage/Localize', assetManager.localizeRead)
 nuke.addOnScriptSave(proj_Manager.checkScriptName)
 
+
+# Foundry Sequence Loader Workflow
+# =====
+
+nuke.addOnUserCreate(assetManager.createDbKnob, nodeClass='Read')
+nuke.addKnobChanged(assetManager.updateDbKnob, nodeClass='Read')
+
+
+def customRead():
+    n = nuke.createNode('Read')
+    n['DB'].setFlag(0) #Set the DB tab to be the active knob when the user opens the node
+
+nuke.menu('Nodes').addCommand('Image/Read', customRead, 'r')
+
+# =====
+
+
 setupMenu()
 
 def savelocalscript():
@@ -74,10 +88,10 @@ def saveserverscript():
         print('what do?')
     else:
         serverDir = os.path.join(config.serverDir(), os.getenv('SHOW'), 'Working', os.getenv('SEQ'), os.getenv('SHOT'), '07. Comp')
-
         nkName = os.path.basename(nuke.root().knob('name').value())
         desc = nkName.split('_')[2]
         fileVersion = int(re.search(r'[vV]\d+', os.path.split(nkName)[1]).group().lstrip('vV'))
+        print serverDir
         proj_Manager.s_easySave(desc, server=serverDir, ver=fileVersion)
 
 # def nkPanelHelper(key):
