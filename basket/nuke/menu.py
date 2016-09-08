@@ -4,6 +4,8 @@ import BasketGlobals as config
 import assetManager
 import logging
 import autowrite
+import burnin
+import dynamicfontpath
 
 proj_Manager = assetManager.HManager()
 
@@ -111,3 +113,4 @@ def saveserverscript():
 # nuke.addOnUserCreate(nkPanelHelper, 'newUser', nodeClass='Root')
 nuke.addOnScriptLoad(savelocalscript)
 nuke.addOnScriptClose(saveserverscript)
+nuke.addOnScriptLoad(dynamicfontpath.updatefonts)
