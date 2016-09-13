@@ -15,8 +15,6 @@ nuke.knobDefault( 'Write.beforeRender', 'assetManager.createWriteDirs()')
 
 
 def setupMenu():
-    # If any of the environment variables are missing, set the basics
-    config.checkEnv()
     shotMenu = '%s - %s' % (os.getenv('SEQ'), os.getenv('SHOT'))
     createUI(shotMenu)
 

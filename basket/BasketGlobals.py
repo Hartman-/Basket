@@ -7,16 +7,6 @@ from glob import glob
 
 # Configure Necessary Global Variables for Basket
 
-def checkEnv():
-    if os.getenv('SEQ') is None or os.getenv('SHOT') is None or os.getenv('SHOW') is None:
-        setupSession()
-
-def setupSession():
-    # DEFINE EXAMPLE ENVIRONMENT
-    os.environ['SHOW'] = 'PROJ_local'
-    os.environ['SEQ'] = 'xyz'
-    os.environ['SHOT'] = '010'
-
 
 def curOS():
     currentOS = platform.system()
@@ -37,7 +27,6 @@ def getNukeScripts():
 
 
 def nukeDir():
-    checkEnv()
     curDir = os.path.join(rootDir(), os.getenv('SHOW'), 'Working', os.getenv('SEQ'), os.getenv('SHOT'), '07. Comp')
     if not os.path.isdir(curDir):
         raise ValueError, 'NUKE Directory does not exist'
