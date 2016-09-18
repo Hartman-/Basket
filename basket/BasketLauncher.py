@@ -148,7 +148,6 @@ class LocalizeProject:
 ''' BEGIN FUNCTION
 	Run the command line program, parse incoming arguments '''
 def initialize():
-    config.setupSession()
     basketLaunch = Launcher()
 
     sequence_list = []
