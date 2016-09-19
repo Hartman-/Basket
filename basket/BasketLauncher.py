@@ -35,7 +35,7 @@ class Launcher:
                 4: '',
                 5: '',
                 6: '',
-                7: 'C:\\Program Files\\Nuke9.0v8\\Nuke9.0.exe',
+                7: 'C:\\Program Files\\Nuke10.0v4\\Nuke10.0.exe',
                 8: ''
             }
             return paths[stage]
@@ -84,6 +84,12 @@ class Launcher:
             newest = max(glob.iglob(os.path.join(config.stageDir(stage), filetypes[stage])), key=os.path.getctime)
         return newest
 
+    @Slot(int, str)
+    def getFromGui(self, stage, tag):
+        self.launch(
+            self.applicationpath(stage),
+            self.latestfile(stage, tag)
+        )
 
 class LocalizeProject:
     def __init__(self):
@@ -220,10 +226,15 @@ def initialize():
 
 
 def goUI():
+    Launch = Launcher()
+
     app = QApplication(sys.argv)
     gui = LauncherGUI.Launcher()
     gui.setWindowTitle('LAW Launcher')
     gui.show()
+
+    gui.launch.connect(Launch.getFromGui)
+
     sys.exit(app.exec_())
 
 
