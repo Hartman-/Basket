@@ -2,6 +2,7 @@
 
 # IMPORT python base modules
 import argparse
+import os
 
 ''' BEGIN FUNCTION
 	Run the command line program, parse incoming arguments '''
@@ -34,7 +35,7 @@ def initialize():
 
     # store_true means to receive no arguments, provide callback of TRUE when flag is used
     parser.add_argument("-r", "--render",
-    	help="# # # NO ACTION # # #",
+    	help=os.getenv('SHOT'),
     	action="store_true")
 
     # Parse the arguments passed into the command line

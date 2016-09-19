@@ -14,7 +14,7 @@ def curOS():
 
 
 def rootDir():
-    return os.path.expanduser('~') + '\\Desktop\\LAW\\'
+    return os.path.expanduser('~') + '\\Desktop\\LAW_local\\'
 
 
 def serverDir():
@@ -74,3 +74,4 @@ def setShot(shot):
 
 if __name__ == '__main__':
     print curOS()
+    print rootDir()

@@ -7,10 +7,10 @@ import shutil
 from PySide.QtCore import *
 from PySide.QtGui import *
 
-from basket import config
+import BasketGlobals as config
 
-from basket.gui import Launcher_ui
-from basket.gui import FileSelector
+from gui import Launcher_ui
+from gui import FileSelector
 
 
 class FruitName:

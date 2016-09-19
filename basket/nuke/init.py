@@ -1,6 +1,6 @@
 def setupDefault():
     # DEFINE EXAMPLE ENVIRONMENT
-    os.environ['SHOW'] = 'PROJ_local'
+    os.environ['SHOW'] = 'PROJ'
     os.environ['SEQ'] = 'xyz'
     os.environ['SHOT'] = '010'
 

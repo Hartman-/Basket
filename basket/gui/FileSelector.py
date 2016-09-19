@@ -5,17 +5,20 @@ import os
 from PySide.QtCore import *
 from PySide.QtGui import *
 
-from basket import config
+import BasketGlobals as config
 
 class Form(QDialog):
 
     launch = Signal(str)
+    nuke_go = Signal()
+    maya_go = Signal()
 
     def __init__(self, parent=None):
         super(Form, self).__init__(parent)
 
         self.nkScripts = config.getNukeScripts()
 
+        # SCENE/SHOT GUI INITIALIZATION
         self.label = QLabel('Directory...')
         self.select_script = QComboBox()
         self.launchbtn = QPushButton('Launch')
@@ -27,6 +30,10 @@ class Form(QDialog):
 
         self.select_scene = QComboBox()
         self.select_shot = QComboBox()
+
+        # LAUNCH BUTTONS
+        self.nukebtn = QPushButton("Nuke")
+        self.mayabtn = QPushButton("Maya")
 
         hbox_scene = QHBoxLayout()
         hbox_scene.addWidget(self.label_scene)
@@ -64,6 +71,10 @@ class Form(QDialog):
         self.select_shot.currentIndexChanged.connect(self.updateEnv)
         self.launchbtn.clicked.connect(self.emitlaunch)
 
+        # Define Signals
+        self.nukebtn.clicked.connect(self.emitnuke)
+        self.mayabtn.clicked.connect(self.emitmaya)
+
     def emitlaunch(self):
         self.launch.emit(os.path.join(self.label.text(), self.select_script.currentText()))
 
@@ -83,3 +94,9 @@ class Form(QDialog):
         for i, n in enumerate (config.getNukeScripts()):
             self.label.setText(os.path.dirname(n))
             self.select_script.addItem(os.path.basename(n))
+
+    def emitnuke(self):
+        self.nuke_go.emit()
+
+    def emitmaya(self):
+        self.maya_go.emit()
