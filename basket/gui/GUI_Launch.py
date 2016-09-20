@@ -20,13 +20,10 @@ class Launcher(QDialog):
         self.label_scene.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         self.label_shot = QLabel('Shot')
         self.label_shot.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        self.label_stage = QLabel('Stage')
         self.dropdown_scene = QComboBox()
         self.dropdown_scene.setMinimumWidth(100)
         self.dropdown_shot = QComboBox()
         self.dropdown_shot.setMinimumWidth(100)
-        self.dropdown_stage = QComboBox()
-        self.dropdown_stage.setMinimumWidth(100)
 
         # POPULATE S3 INPUTS
         for i_scene, t_scene in enumerate(next(os.walk(os.path.join(config.serverDir(), os.getenv('SHOW'), 'Working')))[1]):
@@ -41,9 +38,6 @@ class Launcher(QDialog):
         # Set the Shot to a default (First in directory)
         config.setShot(self.dropdown_shot.currentText())
 
-        for i_stage, t_stage in enumerate(next(os.walk(os.path.join(config.serverDir(), os.getenv('SHOW'), 'Working', os.getenv('SEQ'), os.getenv('SHOT'))))[1]):
-            self.dropdown_stage.addItem(t_stage)
-
         self.dropdown_scene.currentIndexChanged.connect(self.updateShotList)
         self.dropdown_shot.currentIndexChanged.connect(self.updateEnv)
 
@@ -56,18 +50,26 @@ class Launcher(QDialog):
         hbox_shot.addWidget(self.label_shot)
         hbox_shot.addWidget(self.dropdown_shot)
 
-        vbox_stage = QVBoxLayout()
-        vbox_stage.addWidget(self.label_stage)
-        vbox_stage.addWidget(self.dropdown_stage)
-
-        # MISC SETTINGS
+        # MISC WIDGETS
+        self.label_options = QLabel('Options')
         self.label_tag = QLabel('Tag')
         self.input_tag = QLineEdit()
+
+        self.label_stage = QLabel('Stage')
+        self.dropdown_stage = QComboBox()
+        self.dropdown_stage.setMinimumWidth(100)
+
+        for i_stage, t_stage in enumerate(next(os.walk(os.path.join(config.serverDir(), os.getenv('SHOW'), 'Working', os.getenv('SEQ'), os.getenv('SHOT'))))[1]):
+            self.dropdown_stage.addItem(t_stage)
 
         # MISC LAYOUT
         vbox_tag = QVBoxLayout()
         vbox_tag.addWidget(self.label_tag)
         vbox_tag.addWidget(self.input_tag)
+
+        vbox_stage = QVBoxLayout()
+        vbox_stage.addWidget(self.label_stage)
+        vbox_stage.addWidget(self.dropdown_stage)
 
         # LAUNCH BUTTONS
         self.btn_launch = QPushButton('Launch')
@@ -84,20 +86,23 @@ class Launcher(QDialog):
         leftUpper = QVBoxLayout()
         leftUpper.addLayout(hbox_scene)
         leftUpper.addLayout(hbox_shot)
+        leftUpper.addStretch(3)
 
         leftUpper.setContentsMargins(20, 20, 20, 20)
 
         leftLower = QVBoxLayout()
         leftLower.addWidget(self.btn_launch)
 
-        leftLower.setContentsMargins(20,20,20,20)
+        leftLower.setContentsMargins(20,0,20,0)
 
         leftColumn.addLayout(leftUpper)
         leftColumn.addLayout(leftLower)
 
         rightColumn = QVBoxLayout()
+        rightColumn.addWidget(self.label_options)
         rightColumn.addLayout(vbox_tag)
         rightColumn.addLayout(vbox_stage)
+        rightColumn.addStretch(3)
 
         appWrapper.addLayout(leftColumn)
         appWrapper.addLayout(rightColumn)
