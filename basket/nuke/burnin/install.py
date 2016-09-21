@@ -2,7 +2,7 @@ import os
 import sys
 import shutil
 
-files = ['init.py', 'menu.py', 'Hartman_dynamicFonts.py', 'Hartman_BurnIn.py', 'Hartman_betterWriteNodes.py', 'icons\imh29_NUKE_icon_Package.png']
+files = ['init.py', 'lawSetup.py', 'Hartman_dynamicFonts.py', 'Hartman_BurnIn.py', 'Hartman_betterWriteNodes.py', 'icons\imh29_NUKE_icon_Package.png']
 instDirs = ['icons', 'python']
 
 homedir = os.path.expanduser('~')

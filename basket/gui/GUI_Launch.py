@@ -1,7 +1,9 @@
 #!/usr/bin/python
 # -'''- coding: utf-8 -'''-
 
+from glob import glob
 import os
+
 from PySide.QtCore import *
 from PySide.QtGui import *
 
@@ -53,7 +55,7 @@ class Launcher(QDialog):
         # MISC WIDGETS
         self.label_options = QLabel('Options')
         self.label_tag = QLabel('Tag')
-        self.input_tag = QLineEdit()
+        self.dropdown_tag = QComboBox()
 
         self.label_stage = QLabel('Stage')
         self.dropdown_stage = QComboBox()
@@ -62,10 +64,12 @@ class Launcher(QDialog):
         for i_stage, t_stage in enumerate(next(os.walk(os.path.join(config.serverDir(), os.getenv('SHOW'), 'Working', os.getenv('SEQ'), os.getenv('SHOT'))))[1]):
             self.dropdown_stage.addItem(t_stage)
 
+        self.dropdown_stage.currentIndexChanged.connect(self.updateTags)
+
         # MISC LAYOUT
         vbox_tag = QVBoxLayout()
         vbox_tag.addWidget(self.label_tag)
-        vbox_tag.addWidget(self.input_tag)
+        vbox_tag.addWidget(self.dropdown_tag)
 
         vbox_stage = QVBoxLayout()
         vbox_stage.addWidget(self.label_stage)
@@ -117,9 +121,30 @@ class Launcher(QDialog):
         self.dropdown_shot.clear()
         config.setSeq(self.dropdown_scene.currentText())
         for i_shot, t_shot in enumerate(
-                next(os.walk(os.path.join(config.rootDir(), os.getenv('SHOW'), 'Working', os.getenv('SEQ'))))[1]):
+                next(os.walk(os.path.join(config.serverDir(), os.getenv('SHOW'), 'Working', os.getenv('SEQ'))))[1]):
             self.dropdown_shot.addItem(t_shot)
+
+        self.updateTags()
 
     def emitlaunch(self):
         # Return the stage index to the launcher, add one to compensate for zero-based index
-        self.launch.emit(int(self.dropdown_stage.currentIndex() + 1), self.input_tag.text())
+        self.launch.emit(int(self.dropdown_stage.currentIndex() + 1), self.dropdown_tag.currentText())
+
+    def getTags(self):
+        # Grab all the files in given stage directory, unbiased of file type
+        files = glob(os.path.join(config.serverStageDir(self.dropdown_stage.currentText()), '*.*'))
+        sort = []
+        for i, n in enumerate(files):
+            # Add all found file variables to a list
+            splt = os.path.basename(n).split('_')
+            if len(splt) >= 2:
+                sort.append(splt[2])
+
+        # Sets are DISTINCT objects, no repeats, removes duplicate names
+        distinct = set(sort)
+        return distinct
+
+    def updateTags(self):
+        self.dropdown_tag.clear()
+        for i_tag, t_tag in enumerate(self.getTags()):
+            self.dropdown_tag.addItem(t_tag)

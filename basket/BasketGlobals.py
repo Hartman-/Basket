@@ -33,6 +33,13 @@ def nukeDir():
     return curDir
 
 
+def serverStageDir(stage):
+    curDir = os.path.join(serverDir(), os.getenv('SHOW'), 'Working', os.getenv('SEQ'), os.getenv('SHOT'), stage)
+    if not os.path.isdir(curDir):
+        raise ValueError, 'NUKE Directory does not exist'
+    return curDir
+
+
 def localFramesDir():
     curDir = os.path.join(rootDir(), os.getenv('SHOW'), 'frames', os.getenv('SEQ'), os.getenv('SHOT'), 'plates')
     if not os.path.isdir(curDir):

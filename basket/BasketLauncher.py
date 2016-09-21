@@ -23,20 +23,25 @@ class Launcher:
         localize.buildlocal()
 
     def launch(self, appPath, filePath):
-        p = subprocess.Popen([appPath, '--nukex', filePath], creationflags=subprocess.CREATE_NEW_CONSOLE)
+        tags = ''
+        print(filePath)
+        if os.path.splitext(filePath)[1] == '.nk':
+            subprocess.Popen([appPath, '--nukex', filePath], creationflags=subprocess.CREATE_NEW_CONSOLE)
+        else:
+            print 'hit'
+            subprocess.Popen([appPath,  '-file', filePath, '-script', 'X:\\Classof2017\\LobstersAreWeird\\basket\\maya\\testmeout.mel'])
 
     def applicationpath(self, stage):
         if config.curOS().lower() == 'windows':
             paths = {
-                0: '',
-                1: '',
-                2: '',
-                3: '',
-                4: '',
-                5: '',
-                6: '',
+                1: 'C:\\Program Files\\Autodesk\\Maya2016.5\\bin\\maya.exe',
+                2: 'C:\\Program Files\\Autodesk\\Maya2016.5\\bin\\maya.exe',
+                3: 'C:\\Program Files\\Autodesk\\Maya2016.5\\bin\\maya.exe',
+                4: 'C:\\Program Files\\Side Effects Software\\Houdini 15.5.565\\bin\\houdinifx.exe',
+                5: 'C:\\Program Files\\Autodesk\\Maya2016.5\\bin\\maya.exe',
+                6: 'C:\\Program Files\\Autodesk\\Maya2016.5\\bin\\maya.exe',
                 7: 'C:\\Program Files\\Nuke10.0v4\\Nuke10.0.exe',
-                8: ''
+                8: 'C:\\Program Files\\Adobe\\Adobe Premiere Pro CC 2015\\Adobe Premiere Pro.exe'
             }
             return paths[stage]
         else:

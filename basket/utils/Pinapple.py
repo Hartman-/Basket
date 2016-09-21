@@ -3,14 +3,13 @@
 
 import os
 import sys
-from glob import glob
 
-# from PySide.QtCore import *
-# from PySide.QtGui import *
+from PySide.QtCore import *
+from PySide.QtGui import *
 
-from basket import config
+import BasketGlobals as config
 
-# from basket.gui import FolderBuild_ui
+import gui.FolderBuild_ui as FolderBuild_ui
 
 
 class FolderBuilder:
@@ -56,19 +55,16 @@ class FolderBuilder:
         self.updatedirectories()
 
 if __name__ == '__main__':
-    # # Create the Qt Application
-    # app = QApplication(sys.argv)
-    # # Create and show the form
-    # form = FolderBuild_ui.Form()
-    # form.setWindowTitle('Folder Creator')
-    # form.show()
-    #
-    # a = FolderBuilder()
-    #
-    # form.btnpressed.connect(a.createdir)
-    # form.dirselected.connect(a.setdirectory)
-    # # Run the main Qt loop
-    # sys.exit(app.exec_())
+    # Create the Qt Application
+    app = QApplication(sys.argv)
+    # Create and show the form
+    form = FolderBuild_ui.Form()
+    form.setWindowTitle('Folder Creator')
+    form.show()
 
-    build = FolderBuilder()
-    build.createdir('C:\Users\imh29\Desktop\LAW_server\PROJ', 'xyz', '010')
+    a = FolderBuilder()
+
+    form.btnpressed.connect(a.createdir)
+    form.dirselected.connect(a.setdirectory)
+    # Run the main Qt loop
+    sys.exit(app.exec_())
