@@ -1,2 +1,2 @@
-$s="Hello There THIS IS IAN";
-print $s;
+python("import mayaSetup");
+python("mayaSetup.main()");
