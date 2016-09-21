@@ -21,7 +21,6 @@ def easy_save(*args):
 
 
 # Adding the file incrementation functionality that Maya should have
-#
 def easy_iterate(*args):
     filePath = cmds.file(query=True, sceneName=True)
     fileName = os.path.basename(filePath)
@@ -65,10 +64,13 @@ def f_easySave(desc, ver=1):
 
 def main():
     cmds.menu(label='Manage', tearOff=True, parent='MayaWindow')
+
     cmds.menuItem(divider=True, dividerLabel='Save')
     cmds.menuItem(label='Easy Save', command=easy_save)
     cmds.menuItem(label='Easy Iterate', command=easy_iterate)
+
     cmds.menuItem(divider=True, dividerLabel='Export')
     cmds.menuItem(label='Publish Asset')
+
     cmds.menuItem(divider=True, dividerLabel='Submit')
     cmds.menuItem(label='Submit to Qube')
