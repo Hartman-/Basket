@@ -36,7 +36,7 @@ def nukeDir():
 def serverStageDir(stage):
     curDir = os.path.join(serverDir(), os.getenv('SHOW'), 'Working', os.getenv('SEQ'), os.getenv('SHOT'), stage)
     if not os.path.isdir(curDir):
-        raise ValueError, 'NUKE Directory does not exist'
+        raise ValueError, 'Stage Directory does not exist'
     return curDir
 
 
@@ -52,8 +52,14 @@ def stageDir(stage):
     baseDir = os.path.join(serverDir(), os.getenv('SHOW'), 'Working', os.getenv('SEQ'), os.getenv('SHOT'))
     # Thanks for starting at Zero lists!
     curDir = os.path.join(baseDir, stages[stage - 1])
+
+    # MAYA LOVES TO MAKE MY LIFE DIFFICULT
+    # THROWING \DOCUMENTS INTO SHIT
+    if 'Documents' in curDir:
+        curDir = curDir.replace('/', '\\').replace('\\Documents', '')
+
     if not os.path.isdir(curDir):
-        raise ValueError, 'File Directory does not exist'
+        raise ValueError, 'File Directory does not exist: ' + curDir
     return curDir
 
 
@@ -82,3 +88,4 @@ def setShot(shot):
 if __name__ == '__main__':
     print curOS()
     print rootDir()
+    print serverDir()
