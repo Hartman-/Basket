@@ -98,7 +98,7 @@ def asset_Publish(*args):
         liststring = ''
         for i, o in enumerate(selected):
             liststring += '-root |'+str(o)+' '
-        eval('AbcExport -j "-frameRange 1 1 -uvWrite -dataFormat ogawa %s -file %s";' % (liststring, fileAbc))
+        eval('AbcExport -j "-frameRange 1 1 -uvWrite -writeFaceSets -writeUVSets -dataFormat ogawa %s -file %s";' % (liststring, fileAbc))
         cmds.file(fileFbx, exportSelected=True, type='FBX export')
         writeLocalLog(os.path.dirname(fileAbc), os.path.basename(cmds.file(query=True, sceneName=True)))
 
@@ -114,7 +114,7 @@ def asset_Import(*args):
     abcFile = ifile[0]
     fbxFile = os.path.splitext(abcFile)[0] + '.fbx'
     print fbxFile
-    abc = cmds.file(abcFile, i=True, returnNewNodes=True)
+
     fbx = cmds.file(fbxFile, r=True, returnNewNodes=True, namespace='ifbx')
 
     # Get all references in the scene
@@ -124,20 +124,32 @@ def asset_Import(*args):
         rFile = cmds.referenceQuery(i, f=True)
         cmds.file(rFile, importReference=True)
 
-    # abcList = abc
-    #
-    # for i_shape, n_shape in enumerate(abcList):
-    #     if not cmds.objectType(n_shape, isType='shape'):
-    #         abcList.pop(i_shape)
-    #
-    # fbxList = []
-    #
-    # for i_fbx, n_fbx in enumerate(abcList):
-    #     for n in fbx:
-    #         print 'abc: ' + n_fbx
-    #         print 'fbx: ' + n.replace('ifbx:', '')
-            # if n_fbx in n.replace('ifbx:', ''):
-            #     print n
+    abc = cmds.file(abcFile, i=True, returnNewNodes=True)
+
+    abcList = abc
+
+    for i_shape, n_shape in enumerate(abcList):
+        if not cmds.objectType(n_shape, isType='shape'):
+            abcList.pop(i_shape)
+
+    fbxList = []
+
+    for i_abc, n_abc in enumerate(abcList):
+        for n_fbx in fbx:
+            print 'abc: ' + n_abc
+            print 'fbx: ' + n_fbx.replace('ifbx:', '')
+            if n_abc in n_fbx.replace('ifbx:', ''):
+                print 'hit me baby one more time'
+                # cmds.connectAttr(n_abc.outPolyMesh[0], n_fbx.inMesh, f=True)
+                # eval('connectAttr -f %s.outPolyMesh[0] %s.inMesh;' % (n_abc, n_fbx))
+
+                sgNode = cmds.listConnections(n_fbx, type='shadingEngine')
+                matMaya = cmds.listConnections(sgNode[0] + '.surfaceShader')
+                objectName = n_fbx.replace('Shape', '')
+                print 'OBJECT: ' + objectName + ' | ' + 'MAYA SHADER: ' + matMaya[0]
+                cmds.select(n_abc)
+                cmds.hyperShade(assign=matMaya[0])
+                cmds.select(cl=True)
     # print abc
     # print fbx
 
