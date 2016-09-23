@@ -248,8 +248,10 @@ def goUI():
     gui = LauncherGUI.Launcher()
     gui.setWindowTitle('LAW Launcher')
 
-    gui.launch.connect(Launch.goLaunch)
-    gui.createnew.connect(Launch.goNewFile)
+    emitter = LauncherGUI.WindowLayout()
+
+    emitter.launch.connect(Launch.goLaunch)
+    emitter.createnew.connect(Launch.goNewFile)
 
     sys.exit(app.exec_())
 

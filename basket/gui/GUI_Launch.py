@@ -201,7 +201,10 @@ class Launcher(QMainWindow):
         menubar = self.menuBar()
         fileMenu = menubar.addMenu('&File')
         buildMenu = menubar.addMenu('&Build')
+
         fileMenu.addAction(exitAction)
+        buildMenu.addAction(shotAction)
+        buildMenu.addAction(syncAction)
 
         mainlayout = WindowLayout()
 
