@@ -10,12 +10,14 @@ from PySide.QtGui import *
 import BasketGlobals as config
 
 
-class Launcher(QDialog):
+class WindowLayout(QWidget):
 
+    # Define Emitter Signals
     launch = Signal(int, str)
+    createnew = Signal(int)
 
     def __init__(self, parent=None):
-        super(Launcher, self).__init__(parent)
+        super(WindowLayout, self).__init__(parent)
 
         # S3 INPUTS
         self.label_scene = QLabel('Scene')
@@ -28,13 +30,15 @@ class Launcher(QDialog):
         self.dropdown_shot.setMinimumWidth(100)
 
         # POPULATE S3 INPUTS
-        for i_scene, t_scene in enumerate(next(os.walk(os.path.join(config.serverDir(), os.getenv('SHOW'), 'Working')))[1]):
+        for i_scene, t_scene in enumerate(
+                next(os.walk(os.path.join(config.serverDir(), os.getenv('SHOW'), 'Working')))[1]):
             self.dropdown_scene.addItem(t_scene)
 
         # Set the Scene to a default (First one in the directory)
         config.setSeq(self.dropdown_scene.currentText())
 
-        for i_shot, t_shot in enumerate(next(os.walk(os.path.join(config.serverDir(), os.getenv('SHOW'), 'Working', os.getenv('SEQ'))))[1]):
+        for i_shot, t_shot in enumerate(
+                next(os.walk(os.path.join(config.serverDir(), os.getenv('SHOW'), 'Working', os.getenv('SEQ'))))[1]):
             self.dropdown_shot.addItem(t_shot)
 
         # Set the Shot to a default (First in directory)
@@ -61,7 +65,9 @@ class Launcher(QDialog):
         self.dropdown_stage = QComboBox()
         self.dropdown_stage.setMinimumWidth(100)
 
-        for i_stage, t_stage in enumerate(next(os.walk(os.path.join(config.serverDir(), os.getenv('SHOW'), 'Working', os.getenv('SEQ'), os.getenv('SHOT'))))[1]):
+        for i_stage, t_stage in enumerate(next(os.walk(
+                os.path.join(config.serverDir(), os.getenv('SHOW'), 'Working', os.getenv('SEQ'), os.getenv('SHOT'))))[
+                                              1]):
             self.dropdown_stage.addItem(t_stage)
 
         self.dropdown_stage.currentIndexChanged.connect(self.updateTags)
@@ -76,7 +82,11 @@ class Launcher(QDialog):
         vbox_stage.addWidget(self.dropdown_stage)
 
         # LAUNCH BUTTONS
-        self.btn_launch = QPushButton('Launch')
+        self.btn_launch = QPushButton('Launch Existing...')
+        self.btn_create = QPushButton('Create New...')
+
+        # Check if there is an existing file
+        self.canLaunch()
 
         # LAUNCH SIGNALS
         self.btn_launch.clicked.connect(self.emitlaunch)
@@ -96,8 +106,9 @@ class Launcher(QDialog):
 
         leftLower = QVBoxLayout()
         leftLower.addWidget(self.btn_launch)
+        leftLower.addWidget(self.btn_create)
 
-        leftLower.setContentsMargins(20,0,20,0)
+        leftLower.setContentsMargins(20, 0, 20, 0)
 
         leftColumn.addLayout(leftUpper)
         leftColumn.addLayout(leftLower)
@@ -110,7 +121,6 @@ class Launcher(QDialog):
 
         appWrapper.addLayout(leftColumn)
         appWrapper.addLayout(rightColumn)
-
 
         self.setLayout(appWrapper)
 
@@ -128,7 +138,10 @@ class Launcher(QDialog):
 
     def emitlaunch(self):
         # Return the stage index to the launcher, add one to compensate for zero-based index
-        self.launch.emit(int(self.dropdown_stage.currentIndex() + 1), self.dropdown_tag.currentText())
+        self.launch.emit(self.getStageIndex(), self.dropdown_tag.currentText())
+
+    def emitcreate(self):
+        self.createnew.emit(self.getStageIndex())
 
     def getTags(self):
         # Grab all the files in given stage directory, unbiased of file type
@@ -148,3 +161,40 @@ class Launcher(QDialog):
         self.dropdown_tag.clear()
         for i_tag, t_tag in enumerate(self.getTags()):
             self.dropdown_tag.addItem(t_tag)
+        # Whenever tags update, we need to update whether or not there is existing file
+        self.canLaunch()
+
+    def getStageIndex(self):
+        return int(self.dropdown_stage.currentIndex() + 1)
+
+    def canLaunch(self):
+        if self.dropdown_tag.count() > 0:
+            self.btn_launch.setEnabled(True)
+        else:
+            self.btn_launch.setDisabled(True)
+
+
+class Launcher(QMainWindow):
+    def __init__(self, parent=None):
+        super(Launcher, self).__init__(parent)
+
+        self.initUI()
+
+    def initUI(self):
+
+        # CREATE MENU BAR
+        exitAction = QAction('&Exit', self)
+        exitAction.setShortcut('Ctrl+Q')
+        exitAction.setStatusTip('Exit application')
+        exitAction.triggered.connect(self.close)
+
+        self.statusBar()
+
+        menubar = self.menuBar()
+        fileMenu = menubar.addMenu('&File')
+        fileMenu.addAction(exitAction)
+
+        mainlayout = WindowLayout()
+
+        self.setCentralWidget(mainlayout)
+        self.show()

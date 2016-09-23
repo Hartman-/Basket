@@ -23,13 +23,27 @@ class Launcher:
         localize.buildlocal()
 
     def launch(self, appPath, filePath):
-        tags = ''
-        print(filePath)
-        if os.path.splitext(filePath)[1] == '.nk':
+        if appPath is self.applicationpath(7):
             subprocess.Popen([appPath, '--nukex', filePath], creationflags=subprocess.CREATE_NEW_CONSOLE)
+        if appPath is self.applicationpath(1):
+            subprocess.Popen([appPath, '-file', filePath, '-script',
+                          'X:\\Classof2017\\LobstersAreWeird\\basket\\maya\\testmeout.mel'])
         else:
-            print 'hit'
-            subprocess.Popen([appPath,  '-file', filePath, '-script', 'X:\\Classof2017\\LobstersAreWeird\\basket\\maya\\testmeout.mel'])
+            print "Houdini or Premiere"
+            subprocess.Popen([appPath, filePath])
+
+
+    def createNewFile(self, appPath):
+        # NUKE is a Special Snowflake
+        if appPath is self.applicationpath(7):
+            subprocess.Popen([appPath, '--nukex'], creationFlags=subprocess.CREATE_NEW_CONSOLE)
+        # Maya Needs its special little MEL file
+        if appPath is self.applicationpath(1):
+            subprocess.Popen([appPath, '-script', 'X:\\Classof2017\\LobstersAreWeird\\basket\\maya\\testmeout.mel'])
+        # Houdini and Premiere are Chill AF
+        else:
+            subprocess.Popen(appPath)
+
 
     def applicationpath(self, stage):
         if config.curOS().lower() == 'windows':
@@ -90,11 +104,18 @@ class Launcher:
         return newest
 
     @Slot(int, str)
-    def getFromGui(self, stage, tag):
+    def goLaunch(self, stage, tag):
         self.launch(
             self.applicationpath(stage),
             self.latestfile(stage, tag)
         )
+
+    @Slot(int)
+    def goNewFile(self, stage):
+        self.createNewFile(
+            self.applicationpath(stage)
+        )
+
 
 class LocalizeProject:
     def __init__(self):
@@ -169,7 +190,6 @@ class LocalizeProject:
 # Catch the initial input
 # User can choose to enter commandline mode if they want
 def catch():
-
     initParse = argparse.ArgumentParser()
     initParse.add_argument("-c", "--cmd",
                            help="Enter CommandLine Mode",
@@ -183,7 +203,6 @@ def catch():
 
 
 def initialize():
-
     basketLaunch = Launcher()
 
     # Initialize the command line argument parser
@@ -236,9 +255,9 @@ def goUI():
     app = QApplication(sys.argv)
     gui = LauncherGUI.Launcher()
     gui.setWindowTitle('LAW Launcher')
-    gui.show()
 
-    gui.launch.connect(Launch.getFromGui)
+    gui.launch.connect(Launch.goLaunch)
+    gui.createnew.connect(Launch.goNewFile)
 
     sys.exit(app.exec_())
 

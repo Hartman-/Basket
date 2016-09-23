@@ -82,6 +82,13 @@ def libraryDir(sub):
     return curDir
 
 
+def framesDir(sub):
+    curDir = os.path.join(serverDir(), os.getenv('SHOW'), 'Frames', os.getenv('SEQ'), os.getenv('SHOT'), str(sub))
+    if not os.path.isdir(curDir):
+        raise ValueError, 'Frames Directory does not exist'
+    return curDir
+
+
 # SET SHOW ENV VARIABLE
 def setShow(show):
     os.environ['SHOW'] = str(show)

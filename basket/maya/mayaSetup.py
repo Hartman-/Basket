@@ -132,8 +132,6 @@ def asset_Import(*args):
         if not cmds.objectType(n_shape, isType='shape'):
             abcList.pop(i_shape)
 
-    fbxList = []
-
     for i_abc, n_abc in enumerate(abcList):
         for n_fbx in fbx:
             print 'abc: ' + n_abc
@@ -150,15 +148,9 @@ def asset_Import(*args):
                 cmds.select(n_abc)
                 cmds.hyperShade(assign=matMaya[0])
                 cmds.select(cl=True)
-    # print abc
-    # print fbx
-
-    # objSel = cmds.ls(sl=True, s=1, dag=1)
-    # for object in objSel:
-    #     SgNodes = cmds.listConnections(object, type='shadingEngine')
-    #     matMaya = cmds.listConnections(SgNodes[0] + '.surfaceShader')
-    #     objectName = object.replace('Shape', '')
-    #     print 'OBJECT: ' + objectName + ' | ' + 'MAYA SHADER: ' + matMaya[0]
+                cmds.select(n_fbx)
+                cmds.delete()
+                cmds.select(cl=True)
 
 
 def main():
