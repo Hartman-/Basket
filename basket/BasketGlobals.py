@@ -14,11 +14,21 @@ def curOS():
 
 
 def rootDir():
-    return os.path.expanduser('~') + '\\Desktop\\LAW_local\\'
+    curDir = os.path.expanduser('~') + '\\Desktop\\LAW_local\\'
+    # MAYA LOVES TO MAKE MY LIFE DIFFICULT
+    # THROWING \DOCUMENTS INTO SHIT
+    if 'Documents' in curDir:
+        curDir = curDir.replace('/', '\\').replace('\\Documents', '')
+    return curDir
 
 
 def serverDir():
-    return os.path.expanduser('~') + '\\Desktop\\LAW_server'
+    curDir = os.path.expanduser('~') + '\\Desktop\\LAW_server\\'
+    # MAYA LOVES TO MAKE MY LIFE DIFFICULT
+    # THROWING \DOCUMENTS INTO SHIT
+    if 'Documents' in curDir:
+        curDir = curDir.replace('/', '\\').replace('\\Documents', '')
+    return curDir
 
 
 def getNukeScripts():
@@ -53,11 +63,6 @@ def stageDir(stage):
     # Thanks for starting at Zero lists!
     curDir = os.path.join(baseDir, stages[stage - 1])
 
-    # MAYA LOVES TO MAKE MY LIFE DIFFICULT
-    # THROWING \DOCUMENTS INTO SHIT
-    if 'Documents' in curDir:
-        curDir = curDir.replace('/', '\\').replace('\\Documents', '')
-
     if not os.path.isdir(curDir):
         raise ValueError, 'File Directory does not exist: ' + curDir
     return curDir
@@ -65,6 +70,13 @@ def stageDir(stage):
 
 def seqDir():
     curDir = os.path.join(serverDir(), os.getenv('SHOW'), 'Frames', os.getenv('SEQ'), os.getenv('SHOT'), 'plates')
+    if not os.path.isdir(curDir):
+        raise ValueError, 'Frames Directory does not exist'
+    return curDir
+
+
+def libraryDir(sub):
+    curDir = os.path.join(serverDir(), os.getenv('SHOW'), 'library', str(sub))
     if not os.path.isdir(curDir):
         raise ValueError, 'Frames Directory does not exist'
     return curDir
@@ -86,6 +98,5 @@ def setShot(shot):
 
 
 if __name__ == '__main__':
-    print curOS()
-    print rootDir()
-    print serverDir()
+    os.environ['SHOW'] = str('PROJ')
+    print os.path.isdir(libraryDir())

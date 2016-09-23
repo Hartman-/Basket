@@ -1,10 +1,25 @@
 import getpass
 import os
 import re
+from time import strftime
 
 import maya.cmds as cmds
+from maya.mel import eval
 
 import BasketGlobals as config
+
+
+def createDirs(input):
+    tgtDir = os.path.dirname(input)
+    if not os.path.isdir(tgtDir):
+        os.makedirs(tgtDir)
+
+
+def writeLocalLog(path, message):
+    txtpath = os.path.join(path, '_publishLog.txt')
+    file = open(txtpath, 'a')
+    file.write(str(strftime("%d %B %Y %H:%M:%S")) + ' | ' + str(message) + ' | ' + getpass.getuser() + '\n')
+    file.close()
 
 
 def easy_save(*args):
@@ -31,7 +46,7 @@ def easy_iterate(*args):
         fileSaved = False
         # Regex split the filename around version delimiter
         # Get the number
-        split = re.split(r'([vV]\d+)', 'xyz_010_cubeTest_v01_imh29.ma')
+        split = re.split(r'([vV]\d+)', fileName)
         version = int(split[1][1:])
         while not fileSaved:
             newName = '%sv%02d%s' % (split[0], version, split[2])
@@ -62,15 +77,73 @@ def f_easySave(desc, ver=1):
         fileSaved = True
     return mayaPath
 
+
+def asset_Publish(*args):
+    var = cmds.promptDialog(
+        title='Publish Asset',
+        message='Asset Name:',
+        button=['OK', 'Cancel'],
+        defaultButton='OK',
+        cancelButton='Cancel',
+        dismissString='Cancel').replace(' ', '')
+    if var == 'OK':
+        desc = cmds.promptDialog(query=True, text=True)
+        abcName = '%s_%s_%s.abc' % ('asset', desc, getpass.getuser())
+        fbxName = '%s_%s_%s.fbx' % ('asset', desc, getpass.getuser())
+
+        fileAbc = os.path.join(config.libraryDir('models'), desc, abcName).replace('\\', '/')
+        fileFbx = os.path.join(config.libraryDir('models'), desc, fbxName).replace('\\', '/')
+        createDirs(fileAbc)
+        selected = cmds.ls(selection=True)
+        liststring = ''
+        for i, o in enumerate(selected):
+            liststring += '-root |'+str(o)+' '
+        eval('AbcExport -j "-frameRange 1 1 -uvWrite -dataFormat ogawa %s -file %s";' % (liststring, fileAbc))
+        cmds.file(fileFbx, exportSelected=True, type='FBX export')
+        writeLocalLog(os.path.dirname(fileAbc), os.path.basename(cmds.file(query=True, sceneName=True)))
+
+
+def asset_Import(*args):
+    basicFilter = "*.abc"
+    # print config.libraryDir('models')
+    ifile = cmds.fileDialog2(
+        dialogStyle=2,
+        fileMode=1,
+        dir=config.libraryDir('models'),
+        fileFilter=basicFilter)
+    abcFile = ifile[0]
+    fbxFile = os.path.splitext(abcFile)[0] + '.fbx'
+    print fbxFile
+    abc = cmds.file(abcFile, i=True, returnNewNodes=True)
+    fbx = cmds.file(fbxFile, r=True, returnNewNodes=True, namespace='fbxImport')
+    refs = cmds.ls(type='reference')
+    for i in refs:
+        rFile = cmds.referenceQuery(i, f=True)
+        cmds.file(rFile, importReference=True)
+
+    print abc
+    print fbx
+
+    # objSel = cmds.ls(sl=True, s=1, dag=1)
+    # for object in objSel:
+    #     SgNodes = cmds.listConnections(object, type='shadingEngine')
+    #     matMaya = cmds.listConnections(SgNodes[0] + '.surfaceShader')
+    #     objectName = object.replace('Shape', '')
+    #     print 'OBJECT: ' + objectName + ' | ' + 'MAYA SHADER: ' + matMaya[0]
+
+
 def main():
-    cmds.menu(label='Manage', tearOff=True, parent='MayaWindow')
+    cmds.menu(label='LAW', tearOff=True, parent='MayaWindow')
 
     cmds.menuItem(divider=True, dividerLabel='Save')
     cmds.menuItem(label='Easy Save', command=easy_save)
     cmds.menuItem(label='Easy Iterate', command=easy_iterate)
 
+    cmds.menuItem(divider=True, dividerLabel='Import')
+    cmds.menuItem(label='Import Asset', command=asset_Import)
+
     cmds.menuItem(divider=True, dividerLabel='Export')
-    cmds.menuItem(label='Publish Asset')
+    cmds.menuItem(label='Publish Asset', command=asset_Publish)
 
     cmds.menuItem(divider=True, dividerLabel='Submit')
     cmds.menuItem(label='Submit to Qube')
