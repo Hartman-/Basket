@@ -188,13 +188,25 @@ class Launcher(QMainWindow):
         exitAction.setStatusTip('Exit application')
         exitAction.triggered.connect(self.close)
 
+        shotAction = QAction('&Create Shot', self)
+        shotAction.setStatusTip('Build out folder structure for a new shot')
+        shotAction.triggered.connect(self.test)
+
+        syncAction = QAction('&Sync Project', self)
+        syncAction.setStatusTip('Sync Local Project with Server')
+        syncAction.triggered.connect(self.test)
+
         self.statusBar()
 
         menubar = self.menuBar()
         fileMenu = menubar.addMenu('&File')
+        buildMenu = menubar.addMenu('&Build')
         fileMenu.addAction(exitAction)
 
         mainlayout = WindowLayout()
 
         self.setCentralWidget(mainlayout)
         self.show()
+
+    def test(self):
+        print 'Hello World'

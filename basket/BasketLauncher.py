@@ -3,7 +3,6 @@
 # IMPORT python base modules
 import argparse
 import glob
-import re
 import shutil
 import subprocess
 import sys
@@ -26,12 +25,9 @@ class Launcher:
         if appPath is self.applicationpath(7):
             subprocess.Popen([appPath, '--nukex', filePath], creationflags=subprocess.CREATE_NEW_CONSOLE)
         if appPath is self.applicationpath(1):
-            subprocess.Popen([appPath, '-file', filePath, '-script',
-                          'X:\\Classof2017\\LobstersAreWeird\\basket\\maya\\testmeout.mel'])
+            subprocess.Popen([appPath, '-file', filePath, '-script', 'X:\\Classof2017\\LobstersAreWeird\\basket\\maya\\testmeout.mel'])
         else:
-            print "Houdini or Premiere"
             subprocess.Popen([appPath, filePath])
-
 
     def createNewFile(self, appPath):
         # NUKE is a Special Snowflake
@@ -43,7 +39,6 @@ class Launcher:
         # Houdini and Premiere are Chill AF
         else:
             subprocess.Popen(appPath)
-
 
     def applicationpath(self, stage):
         if config.curOS().lower() == 'windows':
@@ -105,10 +100,7 @@ class Launcher:
 
     @Slot(int, str)
     def goLaunch(self, stage, tag):
-        self.launch(
-            self.applicationpath(stage),
-            self.latestfile(stage, tag)
-        )
+        self.launch(self.applicationpath(stage),self.latestfile(stage, tag))
 
     @Slot(int)
     def goNewFile(self, stage):

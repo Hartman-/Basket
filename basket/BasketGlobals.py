@@ -83,7 +83,7 @@ def libraryDir(sub):
 
 
 def framesDir(sub):
-    curDir = os.path.join(serverDir(), os.getenv('SHOW'), 'Frames', os.getenv('SEQ'), os.getenv('SHOT'), str(sub))
+    curDir = os.path.join(serverDir(), os.getenv('SHOW'), 'Frames')
     if not os.path.isdir(curDir):
         raise ValueError, 'Frames Directory does not exist'
     return curDir
@@ -105,5 +105,4 @@ def setShot(shot):
 
 
 if __name__ == '__main__':
-    os.environ['SHOW'] = str('PROJ')
-    print os.path.isdir(libraryDir())
+    print framesDir(None)

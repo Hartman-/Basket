@@ -4,4 +4,4 @@
 @SET MAYA_APP_DIR=C:\Users\%USERNAME%\Documents\maya
 @SET SHOW=PROJ
 @CD /d X:\Classof2017\LobstersAreWeird\basket
-@python BasketLauncher.py %1
+@python BasketLauncher.py

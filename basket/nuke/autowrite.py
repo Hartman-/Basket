@@ -54,8 +54,8 @@ def dropAutoWrite():
     w.knob('label').setValue(feedback)
     
     # Re-assemble the path fragments into a proper output path
-    output_path = "[value proj_root]/frames/[value seq]/[value shot]/comp/[value script]/[value input.width]x[value input.height]/[value script].%04d.dpx"
-    proxy_path = "[value proj_root]/frames/[value seq]/[value shot]/comp/[value script]/[value input.width]x[value input.height]/[value script].%04d.dpx"
+    output_path = "[value proj_root]/frames/[value seq]/[value shot]/comp/[value script]/[value script].%04d.dpx"
+    proxy_path = "[value proj_root]/frames/[value seq]/[value shot]/comp/[value script]/[value script].%04d.dpx"
     w.knob('file').fromScript(output_path)
     w.knob('proxy').fromScript(proxy_path)
 
