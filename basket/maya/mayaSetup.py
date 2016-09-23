@@ -115,14 +115,31 @@ def asset_Import(*args):
     fbxFile = os.path.splitext(abcFile)[0] + '.fbx'
     print fbxFile
     abc = cmds.file(abcFile, i=True, returnNewNodes=True)
-    fbx = cmds.file(fbxFile, r=True, returnNewNodes=True, namespace='fbxImport')
+    fbx = cmds.file(fbxFile, r=True, returnNewNodes=True, namespace='ifbx')
+
+    # Get all references in the scene
+    # Make the references imported
     refs = cmds.ls(type='reference')
     for i in refs:
         rFile = cmds.referenceQuery(i, f=True)
         cmds.file(rFile, importReference=True)
 
-    print abc
-    print fbx
+    # abcList = abc
+    #
+    # for i_shape, n_shape in enumerate(abcList):
+    #     if not cmds.objectType(n_shape, isType='shape'):
+    #         abcList.pop(i_shape)
+    #
+    # fbxList = []
+    #
+    # for i_fbx, n_fbx in enumerate(abcList):
+    #     for n in fbx:
+    #         print 'abc: ' + n_fbx
+    #         print 'fbx: ' + n.replace('ifbx:', '')
+            # if n_fbx in n.replace('ifbx:', ''):
+            #     print n
+    # print abc
+    # print fbx
 
     # objSel = cmds.ls(sl=True, s=1, dag=1)
     # for object in objSel:
