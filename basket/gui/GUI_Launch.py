@@ -115,7 +115,7 @@ class WindowLayout(QWidget):
 
     def updateSceneList(self):
         self.dropdown_scene.clear()
-        for i_scene, t_scene in enumerate(next(os.walk(os.path.join(config.serverDir(), os.getenv('SHOW'), 'working')))[1]):
+        for i_scene, t_scene in enumerate(next(os.walk(os.path.join(config.serverDir(), 'working')))[1]):
             if t_scene != 'assets':
                 self.dropdown_scene.addItem(t_scene)
         config.setSeq(self.dropdown_scene.currentText())
@@ -123,7 +123,7 @@ class WindowLayout(QWidget):
     def updateShotList(self):
         self.dropdown_shot.clear()
         if os.getenv('SEQ') != '':
-            for i_shot, t_shot in enumerate(next(os.walk(os.path.join(config.serverDir(), os.getenv('SHOW'), 'Working', os.getenv('SEQ'))))[1]):
+            for i_shot, t_shot in enumerate(next(os.walk(os.path.join(config.serverDir(), 'Working', os.getenv('SEQ'))))[1]):
                 self.dropdown_shot.addItem(t_shot)
             config.setShot(self.dropdown_shot.currentText())
             self.updateTags()

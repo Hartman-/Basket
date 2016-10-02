@@ -129,14 +129,14 @@ class LocalizeProject:
 
     def buildlocal(self):
         for root_index, root_dir in enumerate(self.firstlevel()):
-            r_directory = os.path.join(config.rootDir(), os.getenv('SHOW'), root_dir)
+            r_directory = os.path.join(config.rootDir(), root_dir)
             if not os.path.exists(r_directory):
                 os.makedirs(r_directory)
 
             # Create any subdirectories
             for sub_index, sub_dir in enumerate(self.subdirs(root_dir)):
                 # Only execute if there is anything
-                s_directory = os.path.join(config.rootDir(), os.getenv('SHOW'), root_dir, sub_dir)
+                s_directory = os.path.join(config.rootDir(), root_dir, sub_dir)
                 if not os.path.exists(s_directory):
                     os.makedirs(s_directory)
 
@@ -150,8 +150,8 @@ class LocalizeProject:
         return [f for f in files if os.path.isfile(os.path.join(dir, f))]
 
     def replicateserver(self):
-        server_root = os.path.join(config.serverDir(), os.getenv('SHOW'))
-        local_root = os.path.join(config.rootDir(), os.getenv('SHOW'))
+        server_root = os.path.join(config.serverDir())
+        local_root = os.path.join(config.rootDir())
 
         # Replicate the WORKING folder structure
         if not os.path.exists(os.path.join(local_root, 'working')):

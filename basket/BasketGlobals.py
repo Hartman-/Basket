@@ -85,21 +85,21 @@ def getNukeScripts():
 
 
 def nukeDir():
-    curDir = os.path.join(rootDir(), os.getenv('SHOW'), 'Working', os.getenv('SEQ'), os.getenv('SHOT'), '07. Comp')
+    curDir = os.path.join(rootDir(), 'Working', os.getenv('SEQ'), os.getenv('SHOT'), '07. Comp')
     if not os.path.isdir(curDir):
         raise ValueError, 'NUKE Directory does not exist'
     return curDir
 
 
 def serverStageDir(stage):
-    curDir = os.path.join(serverDir(), os.getenv('SHOW'), 'Working', os.getenv('SEQ'), os.getenv('SHOT'), stage)
+    curDir = os.path.join(serverDir(), 'Working', os.getenv('SEQ'), os.getenv('SHOT'), stage)
     if not os.path.isdir(curDir):
         raise ValueError, 'Stage Directory does not exist'
     return curDir
 
 
 def localFramesDir():
-    curDir = os.path.join(rootDir(), os.getenv('SHOW'), 'frames', os.getenv('SEQ'), os.getenv('SHOT'), 'plates')
+    curDir = os.path.join(rootDir(), 'frames', os.getenv('SEQ'), os.getenv('SHOT'), 'plates')
     if not os.path.isdir(curDir):
         raise ValueError, 'Frames Directory does not exist'
     return curDir
@@ -107,7 +107,7 @@ def localFramesDir():
 
 def stageDir(stage):
     stages = ['01. PreVis', '02. Layout', '03. Anim', '04. FX', '05. Lighting', '06. Render', '07. Comp', '08. Edit']
-    baseDir = os.path.join(serverDir(), os.getenv('SHOW'), 'Working', os.getenv('SEQ'), os.getenv('SHOT'))
+    baseDir = os.path.join(serverDir(), 'Working', os.getenv('SEQ'), os.getenv('SHOT'))
     # Thanks for starting at Zero lists!
     curDir = os.path.join(baseDir, stages[stage - 1])
 
@@ -117,21 +117,21 @@ def stageDir(stage):
 
 
 def seqDir():
-    curDir = os.path.join(serverDir(), os.getenv('SHOW'), 'Frames', os.getenv('SEQ'), os.getenv('SHOT'), 'plates')
+    curDir = os.path.join(serverDir(), 'Frames', os.getenv('SEQ'), os.getenv('SHOT'), 'plates')
     if not os.path.isdir(curDir):
         raise ValueError, 'Frames Directory does not exist'
     return curDir
 
 
 def libraryDir(sub):
-    curDir = os.path.join(serverDir(), os.getenv('SHOW'), 'library', str(sub))
+    curDir = os.path.join(serverDir(), 'library', str(sub))
     if not os.path.isdir(curDir):
         raise ValueError, 'Frames Directory does not exist'
     return curDir
 
 
 def framesDir():
-    curDir = os.path.join(serverDir(), os.getenv('SHOW'), 'Frames')
+    curDir = os.path.join(serverDir(), 'Frames')
     print curDir
     if not os.path.isdir(curDir):
         raise ValueError, 'Frames Directory does not exist'

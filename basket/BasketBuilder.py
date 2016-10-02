@@ -7,8 +7,8 @@ import BasketGlobals as config
 
 
 # SET THE BASE LOCATION
-SERVER = os.path.join(config.serverDir(), os.getenv('SHOW'))
-LOCAL = os.path.join(config.rootDir(), os.getenv('SHOW'))
+SERVER = os.path.join(config.serverDir())
+LOCAL = os.path.join(config.rootDir())
 
 
 # Basic 'Safe' Server Directory make
