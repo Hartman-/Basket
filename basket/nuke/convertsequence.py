@@ -19,15 +19,16 @@ import sys
 #
 # dirPath = os.path.join(config.framesDir(), str(sys.argv[1]), str(sys.argv[2]), str(sys.argv[3]), str(sys.argv[4]))
 
-inputPath = sys.argv[1]
-# inputPath = 'C:/Users/imh29/Desktop/LAW_server/PROJ/frames/xyz/010/cg/Ravine.cam_010/Ravine.cam_010.0001.exr'
+inputPath = sys.argv[1].replace('//', '\\\\').replace('/', '\\')
+# inputPath = '//awexpress.westphal.drexel.edu/digm_anfx/SRPJ_LAW/ALAW/renderman/HeroShipTurntable_v002_imh29_0/images/Turntable1_cam_010Shape/Turntable1_cam_010Shape.0001.exr'.replace('//', '\\\\').replace('/', '\\')
 dirPath = os.path.dirname(inputPath)
 
 def getSequence():
-    files = glob(os.path.join(dirPath, '*.*.*'))
+    files = sorted(glob(os.path.join(dirPath, '*.*.*')), key=os.path.getmtime)
     return files
 
 seqFiles = getSequence()
+print seqFiles[0]
 
 dirName = os.path.basename(dirPath)
 
@@ -57,7 +58,7 @@ writePath = os.path.join(dirPath, writeName).replace('\\', '/')
 # print 'Write: %s' % writePath
 
 
-# NUKE Nodes
+# # NUKE Nodes
 r = nuke.nodes.Read(file=filePath)
 r.knob('first').setValue(int(firstFrame))
 r.knob('last').setValue(int(lastFrame))

@@ -7,6 +7,7 @@ import os
 from PySide.QtCore import *
 from PySide.QtGui import *
 
+import BasketBuilder
 import BasketGlobals as config
 
 
@@ -29,24 +30,6 @@ class WindowLayout(QWidget):
         self.dropdown_shot = QComboBox()
         self.dropdown_shot.setMinimumWidth(100)
 
-        # POPULATE S3 INPUTS
-        for i_scene, t_scene in enumerate(
-                next(os.walk(os.path.join(config.serverDir(), os.getenv('SHOW'), 'Working')))[1]):
-            self.dropdown_scene.addItem(t_scene)
-
-        # Set the Scene to a default (First one in the directory)
-        config.setSeq(self.dropdown_scene.currentText())
-
-        for i_shot, t_shot in enumerate(
-                next(os.walk(os.path.join(config.serverDir(), os.getenv('SHOW'), 'Working', os.getenv('SEQ'))))[1]):
-            self.dropdown_shot.addItem(t_shot)
-
-        # Set the Shot to a default (First in directory)
-        config.setShot(self.dropdown_shot.currentText())
-
-        self.dropdown_scene.currentIndexChanged.connect(self.updateShotList)
-        self.dropdown_shot.currentIndexChanged.connect(self.updateEnv)
-
         # S3 LAYOUT
         hbox_scene = QHBoxLayout()
         hbox_scene.addWidget(self.label_scene)
@@ -65,12 +48,10 @@ class WindowLayout(QWidget):
         self.dropdown_stage = QComboBox()
         self.dropdown_stage.setMinimumWidth(100)
 
-        for i_stage, t_stage in enumerate(next(os.walk(
-                os.path.join(config.serverDir(), os.getenv('SHOW'), 'Working', os.getenv('SEQ'), os.getenv('SHOT'))))[
-                                              1]):
+        stages = ['01. PreVis', '02. Layout', '03. Anim', '04. FX', '05. Lighting', '06. Render', '07. Comp',
+                  '08. Edit']
+        for i_stage, t_stage in enumerate(stages):
             self.dropdown_stage.addItem(t_stage)
-
-        self.dropdown_stage.currentIndexChanged.connect(self.updateTags)
 
         # MISC LAYOUT
         vbox_tag = QVBoxLayout()
@@ -86,7 +67,8 @@ class WindowLayout(QWidget):
         self.btn_create = QPushButton('Create New...')
 
         # Check if there is an existing file
-        self.canLaunch()
+        self.updateDB()
+        self.dropdown_scene.currentIndexChanged.connect(self.updateShotList)
 
         # LAUNCH SIGNALS
         self.btn_launch.clicked.connect(self.emitlaunch)
@@ -127,14 +109,26 @@ class WindowLayout(QWidget):
     def updateEnv(self):
         config.setShot(self.dropdown_shot.currentText())
 
+    def updateDB(self):
+        self.updateSceneList()
+        self.updateShotList()
+
+    def updateSceneList(self):
+        self.dropdown_scene.clear()
+        for i_scene, t_scene in enumerate(next(os.walk(os.path.join(config.serverDir(), os.getenv('SHOW'), 'working')))[1]):
+            if t_scene != 'assets':
+                self.dropdown_scene.addItem(t_scene)
+        config.setSeq(self.dropdown_scene.currentText())
+
     def updateShotList(self):
         self.dropdown_shot.clear()
-        config.setSeq(self.dropdown_scene.currentText())
-        for i_shot, t_shot in enumerate(
-                next(os.walk(os.path.join(config.serverDir(), os.getenv('SHOW'), 'Working', os.getenv('SEQ'))))[1]):
-            self.dropdown_shot.addItem(t_shot)
-
-        self.updateTags()
+        if os.getenv('SEQ') != '':
+            for i_shot, t_shot in enumerate(next(os.walk(os.path.join(config.serverDir(), os.getenv('SHOW'), 'Working', os.getenv('SEQ'))))[1]):
+                self.dropdown_shot.addItem(t_shot)
+            config.setShot(self.dropdown_shot.currentText())
+            self.updateTags()
+        else:
+            self.canLaunch()
 
     def emitlaunch(self):
         # Return the stage index to the launcher, add one to compensate for zero-based index
@@ -168,10 +162,66 @@ class WindowLayout(QWidget):
         return int(self.dropdown_stage.currentIndex() + 1)
 
     def canLaunch(self):
-        if self.dropdown_tag.count() > 0:
+        if self.dropdown_tag.count() >= 1:
             self.btn_launch.setEnabled(True)
         else:
             self.btn_launch.setDisabled(True)
+
+
+class QDialog_FolderCreate(QDialog):
+
+    sendirs = Signal(str, str)
+
+    def __init__(self, parent=None):
+        super(QDialog_FolderCreate, self).__init__(parent)
+
+        self.sceneLabel = QLabel("Scene: ")
+        self.sceneLabel.setMinimumWidth(40)
+        self.sceneName = QLineEdit()
+        self.sceneName.setMaximumWidth(150)
+        self.sceneName.setPlaceholderText("Type Scene Here...")
+
+        self.shotLabel = QLabel("Shot: ")
+        self.shotLabel.setMinimumWidth(40)
+        self.shotName = QLineEdit()
+        self.shotName.setMaximumWidth(150)
+        self.shotName.setPlaceholderText("Type Shot Here...")
+
+        self.submitbtn = QPushButton("Create")
+        self.quitbtn = QPushButton("Quit")
+        self.quitbtn.clicked.connect(self.close)
+
+        hbox_Scene = QHBoxLayout()
+        hbox_Scene.addWidget(self.sceneLabel)
+        hbox_Scene.addWidget(self.sceneName)
+        hbox_Scene.addStretch(1)
+
+        hbox_Shot = QHBoxLayout()
+        hbox_Shot.addWidget(self.shotLabel)
+        hbox_Shot.addWidget(self.shotName)
+        hbox_Shot.addStretch(1)
+
+        hbox_Cmd = QHBoxLayout()
+        hbox_Cmd.addStretch(1)
+        hbox_Cmd.addWidget(self.submitbtn)
+        hbox_Cmd.addWidget(self.quitbtn)
+
+        # Create layout and add widgets
+        layout = QVBoxLayout()
+        layout.addLayout(hbox_Scene)
+        layout.addLayout(hbox_Shot)
+        layout.addLayout(hbox_Cmd)
+
+        # Set dialog layout
+        self.setLayout(layout)
+
+        # Add submitbtn signal
+        self.submitbtn.clicked.connect(self.pressbtn)
+
+    def pressbtn(self):
+        self.sendirs.emit(self.sceneName.text(), self.shotName.text())
+        self.sceneName.clear()
+        self.shotName.clear()
 
 
 class Launcher(QMainWindow):
@@ -190,7 +240,7 @@ class Launcher(QMainWindow):
 
         shotAction = QAction('&Create Shot', self)
         shotAction.setStatusTip('Build out folder structure for a new shot')
-        shotAction.triggered.connect(self.test)
+        shotAction.triggered.connect(self.create_dir)
 
         syncAction = QAction('&Sync Project', self)
         syncAction.setStatusTip('Sync Local Project with Server')
@@ -206,10 +256,21 @@ class Launcher(QMainWindow):
         buildMenu.addAction(shotAction)
         buildMenu.addAction(syncAction)
 
-        mainlayout = WindowLayout()
+        self.mainlayout = WindowLayout()
 
-        self.setCentralWidget(mainlayout)
+        self.setCentralWidget(self.mainlayout)
         self.show()
 
     def test(self):
         print 'Hello World'
+
+    def create_dir(self):
+        self.modalFolder = QDialog_FolderCreate()
+        self.modalFolder.setWindowTitle('Create')
+        self.modalFolder.show()
+        self.modalFolder.sendirs.connect(self.send_to_make)
+
+    @Slot(str, str)
+    def send_to_make(self, scene, shot):
+        BasketBuilder.make_prod_dir(scene, shot)
+        self.mainlayout.updateDB()

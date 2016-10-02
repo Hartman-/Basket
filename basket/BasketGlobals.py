@@ -1,11 +1,57 @@
 #!/usr/bin/env python
 
-import re
 import os
 import platform
 from glob import glob
 
-# Configure Necessary Global Variables for Basket
+
+# GLOBAL CONSTANTS
+
+# --- File Structure Constants ---
+BASE_DIRS = {
+             'delivery': [
+                 'dailies'
+             ],
+             'docs': [],
+             'frames': [],
+             'library': [
+                 'models',
+                 'templates',
+                 'sound',
+                 'texture'
+             ],
+             'publish': [],
+             'source': [
+                 'plates',
+                 'reference'
+             ],
+             'working': []}
+
+PROD_DIRS = [
+    'working',
+    'publish'
+]
+
+STAGE_DIRS = [
+    '01. PreVis',
+    '02. Layout',
+    '03. Anim',
+    '04. FX',
+    '05. Lighting',
+    '06. Render',
+    '07. Comp',
+    '08. Edit'
+]
+
+FRAME_DIRS = [
+    'cg',
+    'comp',
+    'edit',
+    'elements',
+    'plates'
+]
+
+# GLOBAL FUNCTIONS
 
 
 def curOS():
@@ -14,7 +60,7 @@ def curOS():
 
 
 def rootDir():
-    curDir = os.path.expanduser('~') + '\\Desktop\\LAW_local\\'
+    curDir = os.path.expanduser('~') + '\\Desktop\\LAW_l\\'
     # MAYA LOVES TO MAKE MY LIFE DIFFICULT
     # THROWING \DOCUMENTS INTO SHIT
     if 'Documents' in curDir:
@@ -23,7 +69,9 @@ def rootDir():
 
 
 def serverDir():
-    curDir = os.path.expanduser('~') + '\\Desktop\\LAW_server\\'
+    # \\awexpress.westphal.drexel.edu\digm_anfx\SRPJ_LAW\ALAW\renderman\HeroShipTurntable_v002_imh29_0\images
+    # curDir = os.path.expanduser('~') + '\\Desktop\\LAW_s\\'
+    curDir = '\\\\awexpress.westphal.drexel.edu\\digm_anfx\\SRPJ_LAW'
     # MAYA LOVES TO MAKE MY LIFE DIFFICULT
     # THROWING \DOCUMENTS INTO SHIT
     if 'Documents' in curDir:
@@ -82,8 +130,9 @@ def libraryDir(sub):
     return curDir
 
 
-def framesDir(sub):
+def framesDir():
     curDir = os.path.join(serverDir(), os.getenv('SHOW'), 'Frames')
+    print curDir
     if not os.path.isdir(curDir):
         raise ValueError, 'Frames Directory does not exist'
     return curDir

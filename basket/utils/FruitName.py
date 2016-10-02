@@ -102,22 +102,6 @@ class LocalProject:
                 ignore=self.ignore_files)
 
 
-    ''' PROBABLY NEVER GOING TO GET USED
-        MOVING TO A NUKE BASED SOLUTION WHERE THE ASSETMANAGER SAVES THE NUKE SCRIPT POST OPEN '''
-    def copyserverfile(self, filename):
-        server_file = os.path.join(config.serverDir(), os.getenv('SHOW'), 'working', os.getenv('SEQ'), os.getenv('SHOT'), '07. Comp', filename)
-        local_dir = os.path.join(config.rootDir(), os.getenv('SHOW'), 'working', os.getenv('SEQ'), os.getenv('SHOT'), '07. Comp')
-
-        shutil.copy2(server_file, local_dir)
-        while not os.path.exists(os.path.join(local_dir, filename)):
-            time.sleep(1)
-            print('l')
-            if os.path.isfile(os.path.join(local_dir, filename)):
-                print('fuck you')
-            else:
-                raise ValueError('File does not Exist!')
-
-
 if __name__ == '__main__':
     # Create the Qt Application
     app = QApplication(sys.argv)

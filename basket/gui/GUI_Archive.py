@@ -48,7 +48,7 @@ class ArchiveDialog(QDialog):
         self.quitbtn.clicked.connect(QCoreApplication.instance().quit)
 
     def selectdirectory(self):
-        fname = QFileDialog.getOpenFileName(None, "Select Image", config.framesDir(None))
+        fname = QFileDialog.getOpenFileName(None, "Select Image", config.framesDir())
         self.pathName.setText(fname[0])
 
     def goArchive(self):
