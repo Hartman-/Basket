@@ -26,7 +26,7 @@ class Launcher:
         if appPath is self.applicationpath(7):
             subprocess.Popen([appPath, '--nukex', filePath], creationflags=subprocess.CREATE_NEW_CONSOLE)
         if appPath is self.applicationpath(1):
-            subprocess.Popen([appPath, '-file', filePath, '-script', 'X:\\Classof2017\\LobstersAreWeird\\basket\\maya\\testmeout.mel'])
+            subprocess.Popen([appPath, '-file', filePath, '-script', 'X:\\Classof2017\\LobstersAreWeird\\basket\\maya\\mayaLaunchCall.mel'])
         else:
             subprocess.Popen([appPath, filePath])
 
@@ -36,7 +36,7 @@ class Launcher:
             subprocess.Popen([appPath, '--nukex'], creationFlags=subprocess.CREATE_NEW_CONSOLE)
         # Maya Needs its special little MEL file
         if appPath is self.applicationpath(1):
-            subprocess.Popen([appPath, '-script', 'X:\\Classof2017\\LobstersAreWeird\\basket\\maya\\testmeout.mel'])
+            subprocess.Popen([appPath, '-script', 'X:\\Classof2017\\LobstersAreWeird\\basket\\maya\\mayaLaunchCall.mel'])
         # Houdini and Premiere are Chill AF
         else:
             subprocess.Popen(appPath)
