@@ -60,7 +60,7 @@ def curOS():
 
 
 def rootDir():
-    curDir = os.path.expanduser('~') + '\\Desktop\\LAW_l\\'
+    curDir = os.path.expanduser('~') + '\\Desktop\\LAW_local\\'
     # MAYA LOVES TO MAKE MY LIFE DIFFICULT
     # THROWING \DOCUMENTS INTO SHIT
     if 'Documents' in curDir:

@@ -2,6 +2,7 @@
 
 import argparse
 import os
+import shutil
 
 import BasketGlobals as config
 
@@ -75,9 +76,34 @@ def build_base_local():
     make_top(config.BASE_DIRS, loc=LOCAL)
 
 
+def ignore_files(dir, files):
+    return [f for f in files if os.path.isfile(os.path.join(dir, f))]
+
+
+def rep_prod_dir():
+    sdirs = []
+    ldirs = []
+    for sdir in next(os.walk(os.path.join(SERVER, 'working')))[1]:
+        sdirs.append(sdir)
+        print "sdir: %s" % sdir
+    for ldir in next(os.walk(os.path.join(LOCAL, 'working')))[1]:
+        ldirs.append(ldir)
+        print "ldir: %s" % ldir
+    missingdirs = list(set(sdirs) - set(ldirs))
+
+    for mdir in missingdirs:
+        if not os.path.exists(os.path.join(LOCAL, 'working', mdir)):
+            shutil.copytree(
+                os.path.join(SERVER, 'working', mdir),
+                os.path.join(LOCAL, 'working', mdir),
+                ignore=ignore_files)
+
+
+
 if __name__ == "__main__":
-    #build_base_server()
-    build_base_local()
+    # build_base_server()
+    # build_base_local()
+    rep_prod_dir()
     # parser = argparse.ArgumentParser(
     #     prog="BasketBuilder",
     #     description="BUILD ALL THE DIRECTORIES!"

@@ -106,17 +106,15 @@ class WindowLayout(QWidget):
 
         self.setLayout(appWrapper)
 
-    def updateEnv(self):
-        config.setShot(self.dropdown_shot.currentText())
-
     def updateDB(self):
         self.updateSceneList()
         self.updateShotList()
 
     def updateSceneList(self):
+        BAD_DIRS = ['assets', 'animatic']
         self.dropdown_scene.clear()
         for i_scene, t_scene in enumerate(next(os.walk(os.path.join(config.serverDir(), 'working')))[1]):
-            if t_scene != 'assets':
+            if t_scene not in BAD_DIRS:
                 self.dropdown_scene.addItem(t_scene)
         config.setSeq(self.dropdown_scene.currentText())
 

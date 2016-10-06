@@ -1,1 +1,0 @@
-nuke.pluginAddPath('C:/Users/IanHartman/Desktop/basket/basket/nuke')

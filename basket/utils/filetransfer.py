@@ -4,7 +4,6 @@ import shutil
 import json
 
 from tinydb import TinyDB, Query
-from basket import config as cfg
 
 
 proj_dir = str(cfg.__project_dir__)

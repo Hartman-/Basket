@@ -13,6 +13,7 @@ from PySide.QtGui import *
 
 # IMPORT custom modules
 import BasketGlobals as config
+import BasketBuilder
 import gui.GUI_Launch as LauncherGUI
 
 
@@ -141,38 +142,13 @@ class LocalizeProject:
                     os.makedirs(s_directory)
 
         # Copy the remaining (working, publish, frames) folders down
-        self.replicateserver()
+        BasketBuilder.rep_prod_dir()
 
     ''' Constructor that returns all files in the current directory
         These files are then ignored in the shutil.copytree '''
 
     def ignore_files(self, dir, files):
         return [f for f in files if os.path.isfile(os.path.join(dir, f))]
-
-    def replicateserver(self):
-        server_root = os.path.join(config.serverDir())
-        local_root = os.path.join(config.rootDir())
-
-        # Replicate the WORKING folder structure
-        if not os.path.exists(os.path.join(local_root, 'working')):
-            shutil.copytree(
-                os.path.join(server_root, 'working'),
-                os.path.join(local_root, 'working'),
-                ignore=self.ignore_files)
-
-        # Replicate the PUBLISH folder structure
-        if not os.path.exists(os.path.join(local_root, 'publish')):
-            shutil.copytree(
-                os.path.join(server_root, 'publish'),
-                os.path.join(local_root, 'publish'),
-                ignore=self.ignore_files)
-
-        # Replicate the FRAMES folder structure
-        if not os.path.exists(os.path.join(local_root, 'frames')):
-            shutil.copytree(
-                os.path.join(server_root, 'frames'),
-                os.path.join(local_root, 'frames'),
-                ignore=self.ignore_files)
 
 
 ''' BEGIN FUNCTION
