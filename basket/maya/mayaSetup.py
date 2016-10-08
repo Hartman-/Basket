@@ -67,7 +67,8 @@ def f_easySave(desc, ver=1):
     fileSaved = False
     version = ver
     while not fileSaved:
-        mayaName = '%s_%s_%s_v%02d_%s_%s.ma' % (os.getenv('SEQ'), os.getenv('SHOT'), desc, version, 'preVis', getpass.getuser())
+        stageName = config.STAGE_DIRS[config.stageNum()].split(' ')[1]
+        mayaName = '%s_%s_%s_v%02d_%s_%s.ma' % (os.getenv('SEQ'), os.getenv('SHOT'), desc, version, stageName, getpass.getuser())
         mayaPath = os.path.join(config.stageDir(1), mayaName)
         if os.path.isfile(mayaPath):
             version += 1
@@ -153,6 +154,36 @@ def asset_Import(*args):
                 cmds.select(cl=True)
 
 
+def scene_Publish(*args):
+    fileSaved = False
+    filePath = cmds.file(query=True, sceneName=True)
+    fileName = os.path.basename(filePath)
+    split = fileName.split('_')
+    newName = '%s_%s_%s_%s.ma' % (split[0], split[1], split[4], split[5])
+    while not fileSaved:
+        mayaPath = os.path.join(config.publishDir(config.stageNum()), newName)
+        cmds.file(rename=mayaPath)
+        cmds.file(save=True, type='mayaAscii')
+        writeLocalLog(os.path.dirname(mayaPath), fileName)
+        fileSaved = True
+    return mayaPath
+
+
+def scene_Reference(*args):
+    basicFilter = "*.ma"
+    ifile = cmds.fileDialog2(
+        caption='Reference Published Scene',
+        okCaption='Reference',
+        dialogStyle=2,
+        fileMode=1,
+        dir=config.publishDir(config.stageNum()),
+        fileFilter=basicFilter)
+    maFile = ifile[0]
+    print maFile
+    namespace = os.path.basename(maFile)[:-3]
+    publishRef = cmds.file(maFile, r=True, returnNewNodes=True, namespace=namespace)
+
+
 def main():
     cmds.menu(label='LAW', tearOff=True, parent='MayaWindow')
 
@@ -162,8 +193,10 @@ def main():
 
     cmds.menuItem(divider=True, dividerLabel='Import')
     cmds.menuItem(label='Import Asset', command=asset_Import)
+    cmds.menuItem(label='Reference Stage', command=scene_Reference)
 
     cmds.menuItem(divider=True, dividerLabel='Export')
+    cmds.menuItem(label='Publish Scene', command=scene_Publish)
     cmds.menuItem(label='Publish Asset', command=asset_Publish)
 
     cmds.menuItem(divider=True, dividerLabel='Submit')

@@ -116,6 +116,16 @@ def stageDir(stage):
     return curDir
 
 
+def publishDir(stage):
+    stages = ['01. PreVis', '02. Layout', '03. Anim', '04. FX', '05. Lighting', '06. Render', '07. Comp', '08. Edit']
+    baseDir = os.path.join(serverDir(), 'publish', os.getenv('SEQ'), os.getenv('SHOT'))
+    # Thanks for starting at Zero lists!
+    curDir = os.path.join(baseDir, stages[stage])
+    if not os.path.isdir(curDir):
+        raise ValueError, 'File Directory does not exist: ' + curDir
+    return curDir
+
+
 def seqDir():
     curDir = os.path.join(serverDir(), 'Frames', os.getenv('SEQ'), os.getenv('SHOT'), 'plates')
     if not os.path.isdir(curDir):
@@ -152,6 +162,13 @@ def setSeq(seq):
 def setShot(shot):
     os.environ['SHOT'] = str(shot)
 
+
+def setStage(stage):
+    os.environ['STAGE'] = str(stage)
+
+
+def stageNum():
+    return int(os.getenv('STAGE')) - 1
 
 if __name__ == '__main__':
     print framesDir(None)

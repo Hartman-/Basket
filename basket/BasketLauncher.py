@@ -101,7 +101,7 @@ class Launcher:
 
     @Slot(int, str)
     def goLaunch(self, stage, tag):
-        self.launch(self.applicationpath(stage),self.latestfile(stage, tag))
+        self.launch(self.applicationpath(stage), self.latestfile(stage, tag))
 
     @Slot(int)
     def goNewFile(self, stage):
@@ -218,16 +218,16 @@ def initialize():
 
 
 def goUI():
-    Launch = Launcher()
+    appLaunch = Launcher()
 
     app = QApplication(sys.argv)
     gui = LauncherGUI.Launcher()
     gui.setWindowTitle('LAW Launcher')
 
-    emitter = LauncherGUI.WindowLayout()
+    emitter = gui.centralWidget()
 
-    emitter.launch.connect(Launch.goLaunch)
-    emitter.createnew.connect(Launch.goNewFile)
+    emitter.launch.connect(appLaunch.goLaunch)
+    emitter.createnew.connect(appLaunch.goNewFile)
 
     sys.exit(app.exec_())
 

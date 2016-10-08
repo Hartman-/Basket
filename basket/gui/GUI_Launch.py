@@ -119,6 +119,7 @@ class WindowLayout(QWidget):
         config.setSeq(self.dropdown_scene.currentText())
 
     def updateShotList(self):
+        config.setSeq(self.dropdown_scene.currentText())
         self.dropdown_shot.clear()
         if os.getenv('SEQ') != '':
             for i_shot, t_shot in enumerate(next(os.walk(os.path.join(config.serverDir(), 'Working', os.getenv('SEQ'))))[1]):
@@ -130,9 +131,11 @@ class WindowLayout(QWidget):
 
     def emitlaunch(self):
         # Return the stage index to the launcher, add one to compensate for zero-based index
+        config.setStage(self.getStageIndex())
         self.launch.emit(self.getStageIndex(), self.dropdown_tag.currentText())
 
     def emitcreate(self):
+        config.setStage(self.getStageIndex())
         self.createnew.emit(self.getStageIndex())
 
     def getTags(self):
@@ -225,7 +228,7 @@ class QDialog_FolderCreate(QDialog):
 class Launcher(QMainWindow):
     def __init__(self, parent=None):
         super(Launcher, self).__init__(parent)
-
+        self.mainlayout = WindowLayout()
         self.initUI()
 
     def initUI(self):
@@ -253,8 +256,6 @@ class Launcher(QMainWindow):
         fileMenu.addAction(exitAction)
         buildMenu.addAction(shotAction)
         buildMenu.addAction(syncAction)
-
-        self.mainlayout = WindowLayout()
 
         self.setCentralWidget(self.mainlayout)
         self.show()

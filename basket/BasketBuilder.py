@@ -85,10 +85,8 @@ def rep_prod_dir():
     ldirs = []
     for sdir in next(os.walk(os.path.join(SERVER, 'working')))[1]:
         sdirs.append(sdir)
-        print "sdir: %s" % sdir
     for ldir in next(os.walk(os.path.join(LOCAL, 'working')))[1]:
         ldirs.append(ldir)
-        print "ldir: %s" % ldir
     missingdirs = list(set(sdirs) - set(ldirs))
 
     for mdir in missingdirs:
