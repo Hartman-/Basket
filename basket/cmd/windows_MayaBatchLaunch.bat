@@ -1,4 +1,4 @@
-@SET MAYA_APP_DIR=C:\Users\%USERNAME%\Documents\maya
-@CD C:\Program Files\Autodesk\Maya2016.5\bin
-@start maya.exe
+@SET HOUDINI_OTLSCAN_PATH=$HOUDINI_OTLSCAN_PATH;X:\Classof2017\LobstersAreWeird\basket\otls
+@CD C:\Program Files\Side Effects Software\Houdini 15.5.565\bin
+@start houdinifx.exe
 @exit

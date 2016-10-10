@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 
-import os
-import re
 import sys
 import subprocess
 
@@ -11,7 +9,6 @@ from PySide.QtGui import *
 import BasketGlobals as config
 
 
-# @Nuke10.0.exe --nukex -ti X:/Classof2017/LobstersAreWeird/basket/nuke/convertsequence.py xyz 010 cg Ravine.cam_010
 class ArchiveDialog(QDialog):
     def __init__(self, parent=None):
         super(ArchiveDialog, self).__init__(parent)
@@ -53,11 +50,13 @@ class ArchiveDialog(QDialog):
 
     def goArchive(self):
         if self.pathName.text() is not None:
+            path = self.pathName.text().replace('//', '\\\\').replace('/', '\\')
+            print path
             subprocess.Popen(['C:\Program Files\Nuke10.0v4\Nuke10.0.exe',
                    '--nukex',
                    '-ti',
                    'X:/Classof2017/LobstersAreWeird/basket/nuke/convertsequence.py',
-                   self.pathName.text()],
+                   path],
                   creationflags=subprocess.CREATE_NEW_CONSOLE)
 
 if __name__ == "__main__":

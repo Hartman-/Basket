@@ -3,7 +3,6 @@
 # IMPORT python base modules
 import argparse
 import glob
-import shutil
 import subprocess
 import sys
 import os
@@ -23,50 +22,23 @@ class Launcher:
         localize.buildlocal()
 
     def launch(self, appPath, filePath):
-        if appPath is self.applicationpath(7):
+        if appPath is config.applicationPath('.nk'):
             subprocess.Popen([appPath, '--nukex', filePath], creationflags=subprocess.CREATE_NEW_CONSOLE)
-        if appPath is self.applicationpath(1):
+        if appPath is config.applicationPath('.ma'):
             subprocess.Popen([appPath, '-file', filePath, '-script', 'X:\\Classof2017\\LobstersAreWeird\\basket\\maya\\mayaLaunchCall.mel'])
         else:
             subprocess.Popen([appPath, filePath])
 
     def createNewFile(self, appPath):
         # NUKE is a Special Snowflake
-        if appPath is self.applicationpath(7):
+        if appPath is config.applicationPath('.nk'):
             subprocess.Popen([appPath, '--nukex'], creationFlags=subprocess.CREATE_NEW_CONSOLE)
         # Maya Needs its special little MEL file
-        if appPath is self.applicationpath(1):
+        if appPath is config.applicationPath('.ma'):
             subprocess.Popen([appPath, '-script', 'X:\\Classof2017\\LobstersAreWeird\\basket\\maya\\mayaLaunchCall.mel'])
         # Houdini and Premiere are Chill AF
         else:
             subprocess.Popen(appPath)
-
-    def applicationpath(self, stage):
-        if config.curOS().lower() == 'windows':
-            paths = {
-                1: 'C:\\Program Files\\Autodesk\\Maya2016.5\\bin\\maya.exe',
-                2: 'C:\\Program Files\\Autodesk\\Maya2016.5\\bin\\maya.exe',
-                3: 'C:\\Program Files\\Autodesk\\Maya2016.5\\bin\\maya.exe',
-                4: 'C:\\Program Files\\Side Effects Software\\Houdini 15.5.565\\bin\\houdinifx.exe',
-                5: 'C:\\Program Files\\Autodesk\\Maya2016.5\\bin\\maya.exe',
-                6: 'C:\\Program Files\\Autodesk\\Maya2016.5\\bin\\maya.exe',
-                7: 'C:\\Program Files\\Nuke10.0v4\\Nuke10.0.exe',
-                8: 'C:\\Program Files\\Adobe\\Adobe Premiere Pro CC 2015\\Adobe Premiere Pro.exe'
-            }
-            return paths[stage]
-        else:
-            paths = {
-                0: '',
-                1: '',
-                2: '',
-                3: '',
-                4: '',
-                5: '',
-                6: '',
-                7: '',
-                8: ''
-            }
-            return paths[stage]
 
     # Get the latest nuke file
     def latestfile(self, stage, tag):
@@ -101,59 +73,31 @@ class Launcher:
 
     @Slot(int, str)
     def goLaunch(self, stage, tag):
-        self.launch(self.applicationpath(stage), self.latestfile(stage, tag))
+        self.launch(config.applicationPath(stage), self.latestfile(stage, tag))
 
     @Slot(int)
     def goNewFile(self, stage):
         self.createNewFile(
-            self.applicationpath(stage)
+            config.applicationPath(stage)
         )
+
+    @Slot(str)
+    def goAsset(self, path):
+        filename, file_extension = os.path.splitext(path)
+        self.launch(config.applicationPath(file_extension), path)
 
 
 class LocalizeProject:
     def __init__(self):
-        self.structure = {
-            'source': ['plates', 'reference'],
-            'library': ['models', 'templates', 'sound', 'texture'],
-            'delivery': ['dailies'],
-            'docs': []
-        }
-
-    def firstlevel(self):
-        folders = []
-        for key, value in self.structure.iteritems():
-            folders.append(key)
-        return folders
-
-    def subdirs(self, dir):
-        return self.structure[dir]
+        print 'I never said that.'
 
     def buildlocal(self):
-        for root_index, root_dir in enumerate(self.firstlevel()):
-            r_directory = os.path.join(config.rootDir(), root_dir)
-            if not os.path.exists(r_directory):
-                os.makedirs(r_directory)
-
-            # Create any subdirectories
-            for sub_index, sub_dir in enumerate(self.subdirs(root_dir)):
-                # Only execute if there is anything
-                s_directory = os.path.join(config.rootDir(), root_dir, sub_dir)
-                if not os.path.exists(s_directory):
-                    os.makedirs(s_directory)
-
+        BasketBuilder.build_base_local()
         # Copy the remaining (working, publish, frames) folders down
         BasketBuilder.rep_prod_dir()
 
-    ''' Constructor that returns all files in the current directory
-        These files are then ignored in the shutil.copytree '''
-
-    def ignore_files(self, dir, files):
-        return [f for f in files if os.path.isfile(os.path.join(dir, f))]
-
-
 ''' BEGIN FUNCTION
 	Run the command line program, parse incoming arguments '''
-
 
 # Catch the initial input
 # User can choose to enter commandline mode if they want
@@ -212,7 +156,7 @@ def initialize():
     config.setShot(args.shot)
 
     basketLaunch.launch(
-        basketLaunch.applicationpath(args.stage),
+        config.applicationPath(args.stage),
         basketLaunch.latestfile(args.stage, args.tag)
     )
 
@@ -228,6 +172,7 @@ def goUI():
 
     emitter.launch.connect(appLaunch.goLaunch)
     emitter.createnew.connect(appLaunch.goNewFile)
+    emitter.openasset.connect(appLaunch.goAsset)
 
     sys.exit(app.exec_())
 

@@ -50,7 +50,7 @@ def make_top(top, loc=SERVER):
 # Make a Working/Publish Shot directory
 def make_prod_dir(scene, shot, loc=SERVER):
     for prod_dir in config.PROD_DIRS:
-        pdir = os.path.join(prod_dir, scene, shot)
+        pdir = os.path.join('working', prod_dir, scene, shot)
         for stage in config.STAGE_DIRS:
             sdir = os.path.join(pdir, stage)
             make_dir(sdir, loc=loc)
@@ -83,34 +83,19 @@ def ignore_files(dir, files):
 def rep_prod_dir():
     sdirs = []
     ldirs = []
-    for sdir in next(os.walk(os.path.join(SERVER, 'working')))[1]:
+    for sdir in next(os.walk(os.path.join(SERVER, 'working', 'scenes')))[1]:
         sdirs.append(sdir)
-    for ldir in next(os.walk(os.path.join(LOCAL, 'working')))[1]:
+    for ldir in next(os.walk(os.path.join(LOCAL, 'working', 'scenes')))[1]:
         ldirs.append(ldir)
     missingdirs = list(set(sdirs) - set(ldirs))
 
     for mdir in missingdirs:
-        if not os.path.exists(os.path.join(LOCAL, 'working', mdir)):
+        if not os.path.exists(os.path.join(LOCAL, 'working', 'scenes', mdir)):
             shutil.copytree(
-                os.path.join(SERVER, 'working', mdir),
-                os.path.join(LOCAL, 'working', mdir),
+                os.path.join(SERVER, 'working', 'scenes', mdir),
+                os.path.join(LOCAL, 'working', 'scenes', mdir),
                 ignore=ignore_files)
 
 
-
 if __name__ == "__main__":
-    # build_base_server()
-    # build_base_local()
     rep_prod_dir()
-    # parser = argparse.ArgumentParser(
-    #     prog="BasketBuilder",
-    #     description="BUILD ALL THE DIRECTORIES!"
-    # )
-    #
-    #
-    # parser.add_argument("-sc",
-    #                     help="Scene",
-    #                     type=str)
-    # parser.add_argument("-sh",
-    #                     help="Shot",
-    #                     type=str)

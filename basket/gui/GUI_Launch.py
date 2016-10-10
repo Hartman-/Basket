@@ -11,14 +11,32 @@ import BasketBuilder
 import BasketGlobals as config
 
 
-class WindowLayout(QWidget):
+class WindowLayout(QTabWidget):
 
     # Define Emitter Signals
     launch = Signal(int, str)
     createnew = Signal(int)
+    openasset = Signal(str)
 
     def __init__(self, parent=None):
         super(WindowLayout, self).__init__(parent)
+
+        # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+        #  TABS
+        # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+
+        self.tabAssets = QWidget()
+        self.tabShots = QWidget()
+
+        self.addTab(self.tabShots, "tabShots")
+        self.addTab(self.tabAssets, "tabAssets")
+
+        self.setTabText(0, "Shots")
+        self.setTabText(1, "Assets")
+
+        # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+        #  SHOTS
+        # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
         # S3 INPUTS
         self.label_scene = QLabel('Scene')
@@ -48,9 +66,7 @@ class WindowLayout(QWidget):
         self.dropdown_stage = QComboBox()
         self.dropdown_stage.setMinimumWidth(100)
 
-        stages = ['01. PreVis', '02. Layout', '03. Anim', '04. FX', '05. Lighting', '06. Render', '07. Comp',
-                  '08. Edit']
-        for i_stage, t_stage in enumerate(stages):
+        for i_stage, t_stage in enumerate(config.STAGE_DIRS):
             self.dropdown_stage.addItem(t_stage)
 
         # MISC LAYOUT
@@ -104,7 +120,49 @@ class WindowLayout(QWidget):
         appWrapper.addLayout(leftColumn)
         appWrapper.addLayout(rightColumn)
 
-        self.setLayout(appWrapper)
+        self.tabShots.setLayout(appWrapper)
+
+        # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+        #  ASSETS
+        # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+
+        self.btn_browse = QPushButton("Browse Assets")
+        self.btn_AssetLaunch = QPushButton("Launch")
+        self.label_Directory = QLabel("Directory:")
+        self.label_Directory.setAlignment(Qt.AlignLeft | Qt.AlignTop)
+        self.text_Directory = QLineEdit()
+
+        self.btn_browse.clicked.connect(self.browseAssets)
+        self.btn_AssetLaunch.clicked.connect(self.launchAsset)
+
+        assetLayout = QVBoxLayout()
+
+        inputLayout = QVBoxLayout()
+        buttonLayout = QHBoxLayout()
+
+        inputLayout.addWidget(self.label_Directory)
+        inputLayout.addWidget(self.text_Directory)
+        buttonLayout.addWidget(self.btn_browse)
+        buttonLayout.addWidget(self.btn_AssetLaunch)
+        inputLayout.addLayout(buttonLayout)
+        inputLayout.addStretch(3)
+
+        assetLayout.addLayout(inputLayout)
+
+        self.tabAssets.setLayout(assetLayout)
+
+    def browseAssets(self):
+        assetFile = QFileDialog.getOpenFileName(self,
+                                                "Open Asset",
+                                                os.path.join(config.serverDir(), 'working', 'assets'),
+                                                )
+        correctedPath = assetFile[0].replace('//', '\\\\').replace('/', '\\')
+        self.text_Directory.setText(correctedPath)
+
+    def launchAsset(self):
+        print 'And I grabbed her by the cat'
+        if self.text_Directory.text() != '':
+            self.openasset.emit(self.text_Directory.text())
 
     def updateDB(self):
         self.updateSceneList()
@@ -113,7 +171,7 @@ class WindowLayout(QWidget):
     def updateSceneList(self):
         BAD_DIRS = ['assets', 'animatic']
         self.dropdown_scene.clear()
-        for i_scene, t_scene in enumerate(next(os.walk(os.path.join(config.serverDir(), 'working')))[1]):
+        for i_scene, t_scene in enumerate(next(os.walk(os.path.join(config.serverDir(), 'working', 'scenes')))[1]):
             if t_scene not in BAD_DIRS:
                 self.dropdown_scene.addItem(t_scene)
         config.setSeq(self.dropdown_scene.currentText())
@@ -122,7 +180,7 @@ class WindowLayout(QWidget):
         config.setSeq(self.dropdown_scene.currentText())
         self.dropdown_shot.clear()
         if os.getenv('SEQ') != '':
-            for i_shot, t_shot in enumerate(next(os.walk(os.path.join(config.serverDir(), 'Working', os.getenv('SEQ'))))[1]):
+            for i_shot, t_shot in enumerate(next(os.walk(os.path.join(config.serverDir(), 'working', 'scenes', os.getenv('SEQ'))))[1]):
                 self.dropdown_shot.addItem(t_shot)
             config.setShot(self.dropdown_shot.currentText())
             self.updateTags()
@@ -245,7 +303,7 @@ class Launcher(QMainWindow):
 
         syncAction = QAction('&Sync Project', self)
         syncAction.setStatusTip('Sync Local Project with Server')
-        syncAction.triggered.connect(self.test)
+        syncAction.triggered.connect(self.synclocal)
 
         self.statusBar()
 
@@ -260,14 +318,14 @@ class Launcher(QMainWindow):
         self.setCentralWidget(self.mainlayout)
         self.show()
 
-    def test(self):
-        print 'Hello World'
-
     def create_dir(self):
-        self.modalFolder = QDialog_FolderCreate()
-        self.modalFolder.setWindowTitle('Create')
-        self.modalFolder.show()
-        self.modalFolder.sendirs.connect(self.send_to_make)
+        modalFolder = QDialog_FolderCreate()
+        modalFolder.setWindowTitle('Create')
+        modalFolder.show()
+        modalFolder.sendirs.connect(self.send_to_make)
+
+    def synclocal(self):
+        BasketBuilder.rep_prod_dir()
 
     @Slot(str, str)
     def send_to_make(self, scene, shot):

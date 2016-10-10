@@ -11,16 +11,8 @@ import os
 import re
 import sys
 
-# import BasketGlobals as config
-#
-# # Set Seq / Shot
-# os.environ['SEQ'] = str(sys.argv[1])
-# os.environ['SHOT'] = str(sys.argv[2])
-#
-# dirPath = os.path.join(config.framesDir(), str(sys.argv[1]), str(sys.argv[2]), str(sys.argv[3]), str(sys.argv[4]))
-
-inputPath = sys.argv[1].replace('//', '\\\\').replace('/', '\\')
-# inputPath = '//awexpress.westphal.drexel.edu/digm_anfx/SRPJ_LAW/ALAW/renderman/HeroShipTurntable_v002_imh29_0/images/Turntable1_cam_010Shape/Turntable1_cam_010Shape.0001.exr'.replace('//', '\\\\').replace('/', '\\')
+inputPath = sys.argv[1]
+# inputPath = '//awexpress.westphal.drexel.edu/digm_anfx/SRPJ_LAW/renderman/HeroShipTurntable_v003_imh29_0/images/frame/frame.0001.exr'.replace('//', '\\\\').replace('/', '\\')
 dirPath = os.path.dirname(inputPath)
 
 def getSequence():
@@ -28,7 +20,6 @@ def getSequence():
     return files
 
 seqFiles = getSequence()
-print seqFiles[0]
 
 dirName = os.path.basename(dirPath)
 
@@ -51,6 +42,7 @@ filePath = os.path.join(dirPath, fileName).replace('\\', '/')
 writeName = '%s.%s' % (dirName, 'mov')
 writePath = os.path.join(dirPath, writeName).replace('\\', '/')
 
+# DEBUGGING
 # print 'First Frame: %s' % firstFrame
 # print 'Last Frame: %s' % lastFrame
 #
@@ -58,11 +50,24 @@ writePath = os.path.join(dirPath, writeName).replace('\\', '/')
 # print 'Write: %s' % writePath
 
 
-# # NUKE Nodes
+# NUKE Nodes
 r = nuke.nodes.Read(file=filePath)
 r.knob('first').setValue(int(firstFrame))
 r.knob('last').setValue(int(lastFrame))
 w = nuke.nodes.Write(file=writePath)
+
+# Gotta make sure the quality is gud
+w.knob('file_type').setValue('mov')
+w.knob('mov64_fps').setValue(30)
+w.knob('meta_codec').setValue('jpeg')
+w.knob('mov64_units').setValue('Frames')
+w.knob('mov64_write_timecode').setValue(True)
+w.knob('mov64_bitrate').setValue(80000)
+
+# Nuke with the reverse logic? ... Lower = Better
+w.knob('mov64_quality_min').setValue(2)
+w.knob('mov64_quality_max').setValue(6)
+
 w.setInput(0, r)
 nuke.execute("Write1", firstFrame, lastFrame)
 

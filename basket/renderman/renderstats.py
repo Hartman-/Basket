@@ -5,7 +5,7 @@ import os
 from glob import glob
 import xml.etree.cElementTree as xml
 
-directory = '\\\\awexpress.westphal.drexel.edu\\digm_anfx\\SRPJ_LAW\\renderman\\HeroShipTurntable_v002_imh29_0\\rib'
+directory = '\\\\awexpress.westphal.drexel.edu\\digm_anfx\\SRPJ_LAW\\renderman\\HeroShipTurntable_v003_imh29_0\\rib'
 dirlist = []
 
 
