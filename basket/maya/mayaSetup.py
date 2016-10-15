@@ -9,6 +9,18 @@ from maya.mel import eval
 import BasketGlobals as config
 
 
+def setProjectDirectory():
+    root = config.serverDir()
+    cmds.workspace(root, o=True)
+
+
+def setupRenderEnvironment():
+    cmds.loadPlugin('RenderMan_For_Maya', quiet=True)
+    cmds.pluginInfo('RenderMan_For_Maya', edit=True, autoload=True)
+    cmds.setAttr('defaultRenderGlobals.ren', 'RenderMan/RIS', type='string')
+    cmds.setAttr("defaultRenderGlobals.imageFilePrefix", "/../../../frames/%s/%s/cg/frame" % (os.getenv('SEQ'), os.getenv('SHOT')), type='string')
+
+
 def createDirs(input):
     tgtDir = os.path.dirname(input)
     if not os.path.isdir(tgtDir):
@@ -69,7 +81,7 @@ def f_easySave(desc, ver=1):
     while not fileSaved:
         stageName = config.STAGE_DIRS[config.stageNum()].split(' ')[1]
         mayaName = '%s_%s_%s_v%02d_%s_%s.ma' % (os.getenv('SEQ'), os.getenv('SHOT'), desc, version, stageName, getpass.getuser())
-        mayaPath = os.path.join(config.stageDir(1), mayaName)
+        mayaPath = os.path.join(config.stageDir(config.stageNum()), mayaName)
         if os.path.isfile(mayaPath):
             version += 1
             continue
@@ -192,12 +204,15 @@ def main():
     cmds.menuItem(label='Easy Iterate', command=easy_iterate)
 
     cmds.menuItem(divider=True, dividerLabel='Import')
-    cmds.menuItem(label='Import Asset', command=asset_Import)
+    # cmds.menuItem(label='Import Asset', command=asset_Import)
     cmds.menuItem(label='Reference Stage', command=scene_Reference)
 
     cmds.menuItem(divider=True, dividerLabel='Export')
     cmds.menuItem(label='Publish Scene', command=scene_Publish)
-    cmds.menuItem(label='Publish Asset', command=asset_Publish)
+    # cmds.menuItem(label='Publish Asset', command=asset_Publish)
 
-    cmds.menuItem(divider=True, dividerLabel='Submit')
-    cmds.menuItem(label='Submit to Qube')
+    # cmds.menuItem(divider=True, dividerLabel='Submit')
+    # cmds.menuItem(label='Submit to Qube')
+
+    setProjectDirectory()
+    setupRenderEnvironment()

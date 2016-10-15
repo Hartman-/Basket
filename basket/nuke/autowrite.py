@@ -43,14 +43,14 @@ def dropAutoWrite():
     # error-checking.
     # This can be turned off if it makes too much of a mess for your taste.
     feedback = """
-    Output Path: [value file]rfa
-
-    
-    Project Root: [value proj_root]
-    Sequence: [value seq]
-    Shot Name: [value shot]
-    Script Name: [value script]
+    Output Path: [value file]
     """
+    
+    # Project Root: [value proj_root]
+    # Sequence: [value seq]
+    # Shot Name: [value shot]
+    # Script Name: [value script]
+
     w.knob('label').setValue(feedback)
     
     # Re-assemble the path fragments into a proper output path

@@ -3,6 +3,7 @@
 
 from glob import glob
 import os
+import subprocess
 
 from PySide.QtCore import *
 from PySide.QtGui import *
@@ -27,12 +28,15 @@ class WindowLayout(QTabWidget):
 
         self.tabAssets = QWidget()
         self.tabShots = QWidget()
+        self.tabMisc = QWidget()
 
         self.addTab(self.tabShots, "tabShots")
         self.addTab(self.tabAssets, "tabAssets")
+        self.addTab(self.tabMisc, "tabMisc")
 
         self.setTabText(0, "Shots")
         self.setTabText(1, "Assets")
+        self.setTabText(2, "Misc")
 
         # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
         #  SHOTS
@@ -85,10 +89,14 @@ class WindowLayout(QTabWidget):
         # Check if there is an existing file
         self.updateDB()
         self.dropdown_scene.currentIndexChanged.connect(self.updateShotList)
+        self.dropdown_stage.currentIndexChanged.connect(self.updateShotList)
 
         # LAUNCH SIGNALS
         self.btn_launch.clicked.connect(self.emitlaunch)
-        self.btn_launch.clicked.connect(QCoreApplication.instance().quit)
+        # self.btn_launch.clicked.connect(QCoreApplication.instance().quit)
+
+        self.btn_create.clicked.connect(self.emitcreate)
+        # self.btn_create.clicked.connect(QCoreApplication.instance().quit)
 
         # APP LAYOUT
         appWrapper = QHBoxLayout()
@@ -151,6 +159,43 @@ class WindowLayout(QTabWidget):
 
         self.tabAssets.setLayout(assetLayout)
 
+        # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+        #  MISC
+        # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+
+        self.label_Browser = QLabel("LAW Server Folder: ")
+        self.btn_Folder = QPushButton("Open")
+
+        self.btn_Folder.clicked.connect(self.openExplorer)
+
+        self.link_WebLogin = QLabel()
+        self.link_Trello = QLabel()
+
+        self.link_WebLogin.setText('''<a href="http://lobstersare.online/wp-login.php">Site Login</a>''')
+        self.link_WebLogin.setOpenExternalLinks(True)
+
+        self.link_Trello.setText('''<a href="https://trello.com/b/OEhZ5SGb">Trello Board</a>''')
+        self.link_Trello.setOpenExternalLinks(True)
+
+        miscLayout = QVBoxLayout()
+        folderLayout = QHBoxLayout()
+        linkLayout = QVBoxLayout()
+
+        folderLayout.addWidget(self.label_Browser)
+        folderLayout.addWidget(self.btn_Folder)
+
+        linkLayout.addWidget(self.link_WebLogin)
+        linkLayout.addWidget(self.link_Trello)
+        linkLayout.addStretch(3)
+
+        miscLayout.addLayout(folderLayout)
+        miscLayout.addLayout(linkLayout)
+
+        self.tabMisc.setLayout(miscLayout)
+
+    def openExplorer(self):
+        subprocess.Popen(r'explorer \\awexpress.westphal.drexel.edu\digm_anfx\SRPJ_LAW')
+
     def browseAssets(self):
         assetFile = QFileDialog.getOpenFileName(self,
                                                 "Open Asset",
@@ -171,9 +216,11 @@ class WindowLayout(QTabWidget):
     def updateSceneList(self):
         BAD_DIRS = ['assets', 'animatic']
         self.dropdown_scene.clear()
-        for i_scene, t_scene in enumerate(next(os.walk(os.path.join(config.serverDir(), 'working', 'scenes')))[1]):
-            if t_scene not in BAD_DIRS:
-                self.dropdown_scene.addItem(t_scene)
+        dirs = next(os.walk(os.path.join(config.serverDir(), 'working', 'scenes')))[1]
+        dirs.sort()
+        for dirname in dirs:
+            if dirname not in BAD_DIRS:
+                self.dropdown_scene.addItem(dirname)
         config.setSeq(self.dropdown_scene.currentText())
 
     def updateShotList(self):
@@ -319,10 +366,10 @@ class Launcher(QMainWindow):
         self.show()
 
     def create_dir(self):
-        modalFolder = QDialog_FolderCreate()
-        modalFolder.setWindowTitle('Create')
-        modalFolder.show()
-        modalFolder.sendirs.connect(self.send_to_make)
+        self.modalFolder = QDialog_FolderCreate()
+        self.modalFolder.setWindowTitle('Create')
+        self.modalFolder.show()
+        self.modalFolder.sendirs.connect(self.send_to_make)
 
     def synclocal(self):
         BasketBuilder.rep_prod_dir()
@@ -330,4 +377,5 @@ class Launcher(QMainWindow):
     @Slot(str, str)
     def send_to_make(self, scene, shot):
         BasketBuilder.make_prod_dir(scene, shot)
+        BasketBuilder.make_frame_dir(scene, shot)
         self.mainlayout.updateDB()

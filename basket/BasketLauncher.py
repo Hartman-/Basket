@@ -24,21 +24,27 @@ class Launcher:
     def launch(self, appPath, filePath):
         if appPath is config.applicationPath('.nk'):
             subprocess.Popen([appPath, '--nukex', filePath], creationflags=subprocess.CREATE_NEW_CONSOLE)
+            return
         if appPath is config.applicationPath('.ma'):
             subprocess.Popen([appPath, '-file', filePath, '-script', 'X:\\Classof2017\\LobstersAreWeird\\basket\\maya\\mayaLaunchCall.mel'])
+            return
         else:
             subprocess.Popen([appPath, filePath])
+            return
 
     def createNewFile(self, appPath):
         # NUKE is a Special Snowflake
         if appPath is config.applicationPath('.nk'):
-            subprocess.Popen([appPath, '--nukex'], creationFlags=subprocess.CREATE_NEW_CONSOLE)
+            subprocess.Popen([appPath, '--nukex'], creationflags=subprocess.CREATE_NEW_CONSOLE)
+            return
         # Maya Needs its special little MEL file
         if appPath is config.applicationPath('.ma'):
             subprocess.Popen([appPath, '-script', 'X:\\Classof2017\\LobstersAreWeird\\basket\\maya\\mayaLaunchCall.mel'])
+            return
         # Houdini and Premiere are Chill AF
         else:
             subprocess.Popen(appPath)
+            return
 
     # Get the latest nuke file
     def latestfile(self, stage, tag):
@@ -77,12 +83,15 @@ class Launcher:
 
     @Slot(int)
     def goNewFile(self, stage):
+        print stage
         self.createNewFile(
             config.applicationPath(stage)
         )
 
     @Slot(str)
     def goAsset(self, path):
+        config.setSeq('bkp')
+        config.setShot('NUKE')
         filename, file_extension = os.path.splitext(path)
         self.launch(config.applicationPath(file_extension), path)
 

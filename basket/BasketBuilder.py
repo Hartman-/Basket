@@ -50,7 +50,10 @@ def make_top(top, loc=SERVER):
 # Make a Working/Publish Shot directory
 def make_prod_dir(scene, shot, loc=SERVER):
     for prod_dir in config.PROD_DIRS:
-        pdir = os.path.join('working', prod_dir, scene, shot)
+        if prod_dir == 'publish':
+            pdir = os.path.join(prod_dir, scene, shot)
+        else:
+            pdir = os.path.join('working', prod_dir, scene, shot)
         for stage in config.STAGE_DIRS:
             sdir = os.path.join(pdir, stage)
             make_dir(sdir, loc=loc)

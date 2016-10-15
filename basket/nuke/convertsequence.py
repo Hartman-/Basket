@@ -12,16 +12,17 @@ import re
 import sys
 
 inputPath = sys.argv[1]
-# inputPath = '//awexpress.westphal.drexel.edu/digm_anfx/SRPJ_LAW/renderman/HeroShipTurntable_v003_imh29_0/images/frame/frame.0001.exr'.replace('//', '\\\\').replace('/', '\\')
+# inputPath = '//awexpress.westphal.drexel.edu/digm_anfx/SRPJ_LAW/renderman/HeroShipTurntable_v003_imh29_0/images/frame_v001/frame_v001.0001.exr'.replace('//', '\\\\').replace('/', '\\')
+# inputPath = 'C:/Users/imh29/Desktop/HoudiniProjects/LAW/render/Flipbook/161012/rocketTest_v007.1.jpg'.replace('//', '\\\\').replace('/', '\\')
+# inputPath = '\\\\awexpress.westphal.drexel.edu\\digm_anfx\\SRPJ_LAW\\frames\\lpo\\010\\cg\\frame.0001.exr'
 dirPath = os.path.dirname(inputPath)
+dirName = re.split(r'\.(\d+)\.', os.path.basename(inputPath))
 
 def getSequence():
     files = sorted(glob(os.path.join(dirPath, '*.*.*')), key=os.path.getmtime)
     return files
 
 seqFiles = getSequence()
-
-dirName = os.path.basename(dirPath)
 
 # GRAB THE RIGHT MOST DIGIT IN THE FIRST FRAME'S FILE NAME
 firstString = re.findall( r'\d+', seqFiles[0] )[-1]
@@ -32,22 +33,22 @@ paddingString = '%02s' % padding
 # CONVERT TO INTEGER
 firstFrame = int( firstString )
 # GET LAST FRAME
-lastFrame = int( re.findall( r'\d+', seqFiles[-1] )[-1] )
+lastFrame = int( re.findall(r'\d+', seqFiles[-1] )[-1] )
 # GET EXTENSION
-ext = os.path.splitext( seqFiles[0] )[-1]
-
-fileName = '%s.%s%s' % (dirName, ('#'*padding), ext)
+# ext = os.path.splitext( seqFiles[0] )[-1]
+ext = dirName[2]
+fileName = '%s.%s.%s' % (dirName[0], ('#'*padding), ext)
 filePath = os.path.join(dirPath, fileName).replace('\\', '/')
 
-writeName = '%s.%s' % (dirName, 'mov')
+writeName = '%s.%s' % (dirName[0], 'mov')
 writePath = os.path.join(dirPath, writeName).replace('\\', '/')
 
 # DEBUGGING
-# print 'First Frame: %s' % firstFrame
-# print 'Last Frame: %s' % lastFrame
-#
-# print 'Read: %s' % filePath
-# print 'Write: %s' % writePath
+print 'First Frame: %s' % firstFrame
+print 'Last Frame: %s' % lastFrame
+
+print 'Read: %s' % filePath
+print 'Write: %s' % writePath
 
 
 # NUKE Nodes

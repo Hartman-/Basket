@@ -80,7 +80,7 @@ class TextNode:
 
         # Determine Correct Font upon creation
         fontKnob = 'font'
-        winDrive = ''
+        winDrive = 'C:'
         SSPPath = ''
 
         SSPMacPath = '/Library/Fonts/SourceSansPro-Regular.otf'

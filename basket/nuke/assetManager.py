@@ -116,23 +116,27 @@ def getVersions():
     # INITIALISE THE DICTIONARY WE WILL RETURN AT THE END OF THE FUNCTION
     versionDict = {}
     # GET THE DIRECTORY BASED ON THE CURRENT SHOT ENVIRONMENT
-    shotDir = os.path.join( config.serverDir(), os.getenv('SHOW'), 'Frames', os.getenv('SEQ'), os.getenv('SHOT') )
+    shotDir = os.path.join( config.framesDir(), os.getenv('SEQ'), os.getenv('SHOT') )
+    print shotDir
     # LOOP THROUGH THE FOLDERS INSIDE THE SHOT DIRECTORY AND COLLECT THE IMAGE SEQUENCES THEY CONTAIN
     for t in types:
+        print t
         versionDict[t] = [] # THIS WILL HOLD THE FOUND SEQUENCES
         typeDir = os.path.join( shotDir, t ) # GET THE CURRENT DIRECTORY PATH
         for d in os.listdir( typeDir ): # LOOP THROUGH IT'S CONTENTS
             path = os.path.join( typeDir, d)
-            if os.path.isdir( path ): # LOOP THROUGH SUB DIRECTORIES
-                versionDict[t].append( getFileSeq( path ).replace('\\', '/') ) # RUN THE getFileSeq() FUNCTION AND APPEND IT'S OUTPUT TO THE LIST
+            print path
+            # if os.path.isdir( path ): # LOOP THROUGH SUB DIRECTORIES
+            versionDict[t].append( getFileSeq( path ) ) # RUN THE getFileSeq() FUNCTION AND APPEND IT'S OUTPUT TO THE LIST
     return versionDict
 
 
 def getFileSeq( dirPath ):
     '''Return file sequence with same name as the parent directory. Very loose example!!'''
-    dirName = os.path.basename( dirPath )
+    path = os.path.dirname( dirPath )
+    dirName = re.split(r'\.(\d+)\.', os.path.basename(dirPath))
     # COLLECT ALL FILES IN THE DIRECTORY THAT HVE THE SAME NAME AS THE DIRECTORY
-    files = glob( os.path.join( dirPath, '%s.*.*' % dirName ) )
+    files = sorted(glob( os.path.join( path, '*.*.*' ) ), key=os.path.getmtime)
     print files
     # GRAB THE RIGHT MOST DIGIT IN THE FIRST FRAME'S FILE NAME
     firstString = re.findall( r'\d+', files[0] )[-1]
@@ -147,7 +151,7 @@ def getFileSeq( dirPath ):
     # GET EXTENSION
     ext = os.path.splitext( files[0] )[-1]
     # BUILD SEQUENCE NOTATION
-    fileName = '%s.%%%sd%s %s-%s' % ( dirName, str(padding).zfill(2), ext, first, last )
+    fileName = '%s.%%%sd%s %s-%s' % ( dirName[0], str(padding).zfill(2), ext, first, last )
     # RETURN FULL PATH AS SEQUENCE NOTATION
     return os.path.join( dirPath, fileName )
 
@@ -191,7 +195,7 @@ def updateDbKnob():
         # POPULATE THE VERSION KNOB WITH THE VERSIONS REQUESTED THROUGH THE TYPE KNOB
         node['_version'].setValues( versionDict[ node['versionType'].value() ] )
         # SET THE A VALUE TO THE FIRST ITEM IN THE LIST
-        node['_version'].setValue(0)
+        # node['_version'].setValue(0)
 
 
 # =====

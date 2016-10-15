@@ -40,10 +40,16 @@ def createUI(name):
     name='NUKE Scripts',
     directory=config.nukeDir(),
     type=nuke.SCRIPT)
+    nuke.addFavoriteDir(
+        name='NUKE Sequences',
+        directory=os.path.join(config.framesDir(), os.getenv('SEQ'), os.getenv('SHOT')),
+        type=nuke.IMAGE
+    )
 
 
 def refreshUI(prev):
     nuke.removeFavoriteDir('NUKE Scripts', nuke.SCRIPT)
+    nuke.removeFavoriteDir('NUKE Sequences', nuke.IMAGE)
     nuke.menu( 'Nuke' ).removeItem(prev)
 
     # UPDATE LOCAL VARIABLES TO MATCH ENVIRONMENT
@@ -59,15 +65,15 @@ nuke.addOnScriptSave(proj_Manager.checkScriptName)
 # Foundry Sequence Loader Workflow
 # =====
 
-nuke.addOnUserCreate(assetManager.createDbKnob, nodeClass='Read')
-nuke.addKnobChanged(assetManager.updateDbKnob, nodeClass='Read')
+# nuke.addOnUserCreate(assetManager.createDbKnob, nodeClass='Read')
+# nuke.addKnobChanged(assetManager.updateDbKnob, nodeClass='Read')
 
 
-def customRead():
-    n = nuke.createNode('Read')
-    n['DB'].setFlag(0) #Set the DB tab to be the active knob when the user opens the node
-
-nuke.menu('Nodes').addCommand('Image/Read', customRead, 'r')
+# def customRead():
+#     n = nuke.createNode('Read')
+#     n['DB'].setFlag(0) #Set the DB tab to be the active knob when the user opens the node
+#
+# nuke.menu('Nodes').addCommand('Image/Read', customRead, 'r')
 
 # =====
 

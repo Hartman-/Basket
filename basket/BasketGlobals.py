@@ -10,7 +10,7 @@ from glob import glob
 # --- File Structure Constants ---
 BASE_DIRS = {
              'delivery': [
-                 'dailies'
+                 'CritiqueArchive'
              ],
              'docs': [],
              'frames': [],
@@ -174,7 +174,7 @@ def stageNum():
 
 
 def applicationPath(ext):
-    if type(ext) is str:
+    if type(ext) is not int:
         paths = {
             '.ma': 'C:\\Program Files\\Autodesk\\Maya2016.5\\bin\\maya.exe',
             '.mb': 'C:\\Program Files\\Autodesk\\Maya2016.5\\bin\\maya.exe',
@@ -184,31 +184,17 @@ def applicationPath(ext):
         }
         return paths[ext]
     else:
-        if curOS().lower() == 'windows':
-            paths = {
-                1: 'C:\\Program Files\\Autodesk\\Maya2016.5\\bin\\maya.exe',
-                2: 'C:\\Program Files\\Autodesk\\Maya2016.5\\bin\\maya.exe',
-                3: 'C:\\Program Files\\Autodesk\\Maya2016.5\\bin\\maya.exe',
-                4: 'C:\\Program Files\\Side Effects Software\\Houdini 15.5.565\\bin\\houdinifx.exe',
-                5: 'C:\\Program Files\\Autodesk\\Maya2016.5\\bin\\maya.exe',
-                6: 'C:\\Program Files\\Autodesk\\Maya2016.5\\bin\\maya.exe',
-                7: 'C:\\Program Files\\Nuke10.0v4\\Nuke10.0.exe',
-                8: 'C:\\Program Files\\Adobe\\Adobe Premiere Pro CC 2015\\Adobe Premiere Pro.exe'
-            }
-            return paths[ext]
-        else:
-            paths = {
-                0: '',
-                1: '',
-                2: '',
-                3: '',
-                4: '',
-                5: '',
-                6: '',
-                7: '',
-                8: ''
-            }
-            return paths[ext]
+        paths = {
+            1: 'C:\\Program Files\\Autodesk\\Maya2016.5\\bin\\maya.exe',
+            2: 'C:\\Program Files\\Autodesk\\Maya2016.5\\bin\\maya.exe',
+            3: 'C:\\Program Files\\Autodesk\\Maya2016.5\\bin\\maya.exe',
+            4: 'C:\\Program Files\\Side Effects Software\\Houdini 15.5.565\\bin\\houdinifx.exe',
+            5: 'C:\\Program Files\\Autodesk\\Maya2016.5\\bin\\maya.exe',
+            6: 'C:\\Program Files\\Autodesk\\Maya2016.5\\bin\\maya.exe',
+            7: 'C:\\Program Files\\Nuke10.0v4\\Nuke10.0.exe',
+            8: 'C:\\Program Files\\Adobe\\Adobe Premiere Pro CC 2015\\Adobe Premiere Pro.exe'
+        }
+        return paths[ext]
 
 
 if __name__ == '__main__':
