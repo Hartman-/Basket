@@ -18,6 +18,7 @@ class WindowLayout(QTabWidget):
     launch = Signal(int, str)
     createnew = Signal(int)
     openasset = Signal(str)
+    # renderscene = Signal(int, str, str)
 
     def __init__(self, parent=None):
         super(WindowLayout, self).__init__(parent)
@@ -73,6 +74,7 @@ class WindowLayout(QTabWidget):
         for i_stage, t_stage in enumerate(config.STAGE_DIRS):
             self.dropdown_stage.addItem(t_stage)
 
+
         # MISC LAYOUT
         vbox_tag = QVBoxLayout()
         vbox_tag.addWidget(self.label_tag)
@@ -86,10 +88,16 @@ class WindowLayout(QTabWidget):
         self.btn_launch = QPushButton('Launch Existing...')
         self.btn_create = QPushButton('Create New...')
 
+        # self.label_render = QLabel('Make Sure Your Camera is Set in the Render Settings!')
+        # self.label_camera = QLabel('Alt Camera:')
+        # self.text_camera = QLineEdit()
+        # self.btn_render = QPushButton('Render Draft')
+
         # Check if there is an existing file
         self.updateDB()
         self.dropdown_scene.currentIndexChanged.connect(self.updateShotList)
-        self.dropdown_stage.currentIndexChanged.connect(self.updateShotList)
+        self.dropdown_stage.currentIndexChanged.connect(self.updateEnv)
+        self.dropdown_shot.currentIndexChanged.connect(self.updateEnv)
 
         # LAUNCH SIGNALS
         self.btn_launch.clicked.connect(self.emitlaunch)
@@ -98,7 +106,10 @@ class WindowLayout(QTabWidget):
         self.btn_create.clicked.connect(self.emitcreate)
         # self.btn_create.clicked.connect(QCoreApplication.instance().quit)
 
+        # self.btn_render.clicked.connect(self.emitrender)
+
         # APP LAYOUT
+        layout = QVBoxLayout()
         appWrapper = QHBoxLayout()
 
         leftColumn = QVBoxLayout()
@@ -125,10 +136,34 @@ class WindowLayout(QTabWidget):
         rightColumn.addLayout(vbox_stage)
         rightColumn.addStretch(3)
 
+        bottomRow = QVBoxLayout()
+
+        line = QFrame()
+        line.setFrameStyle(QFrame.HLine | QFrame.Sunken)
+        line.setLineWidth(1)
+        line.setMidLineWidth(1)
+
+        # bottomRow.addWidget(line)
+        # bottomContent = QVBoxLayout()
+
+        # camLayout = QHBoxLayout()
+        # camLayout.addWidget(self.label_camera)
+        # camLayout.addWidget(self.text_camera)
+
+        # bottomContent.addLayout(camLayout)
+        # bottomContent.addWidget(self.label_render)
+        # bottomContent.addWidget(self.btn_render)
+        # bottomContent.setContentsMargins(0,20,0,20)
+        #
+        # bottomRow.addLayout(bottomContent)
+
         appWrapper.addLayout(leftColumn)
         appWrapper.addLayout(rightColumn)
 
-        self.tabShots.setLayout(appWrapper)
+        layout.addLayout(appWrapper)
+        # layout.addLayout(bottomRow)
+
+        self.tabShots.setLayout(layout)
 
         # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
         #  ASSETS
@@ -243,9 +278,13 @@ class WindowLayout(QTabWidget):
         config.setStage(self.getStageIndex())
         self.createnew.emit(self.getStageIndex())
 
+    def emitrender(self):
+        config.setStage(self.getStageIndex())
+        self.renderscene.emit(self.getStageIndex(), self.dropdown_tag.currentText(), self.text_camera.text())
+
     def getTags(self):
         # Grab all the files in given stage directory, unbiased of file type
-        files = glob(os.path.join(config.serverStageDir(self.dropdown_stage.currentText()), '*.*'))
+        files = glob(os.path.join(config.stageDir(self.getStageIndex()), '*.*'))
         sort = []
         for i, n in enumerate(files):
             # Add all found file variables to a list
@@ -265,13 +304,20 @@ class WindowLayout(QTabWidget):
         self.canLaunch()
 
     def getStageIndex(self):
-        return int(self.dropdown_stage.currentIndex() + 1)
+        return int(self.dropdown_stage.currentIndex())
 
     def canLaunch(self):
         if self.dropdown_tag.count() >= 1:
             self.btn_launch.setEnabled(True)
+            # self.btn_render.setEnabled(True)
         else:
             self.btn_launch.setDisabled(True)
+            # self.btn_render.setDisabled(True)
+
+    def updateEnv(self):
+        if self.dropdown_shot.currentText() != '':
+            config.setShot(self.dropdown_shot.currentText())
+            self.updateTags()
 
 
 class QDialog_FolderCreate(QDialog):

@@ -83,18 +83,34 @@ class Launcher:
 
     @Slot(int)
     def goNewFile(self, stage):
-        print stage
         self.createNewFile(
             config.applicationPath(stage)
         )
 
-    @Slot(str)
+    @Slot(int, str)
     def goAsset(self, path):
         config.setSeq('bkp')
         config.setShot('NUKE')
         filename, file_extension = os.path.splitext(path)
         self.launch(config.applicationPath(file_extension), path)
 
+    @Slot(int, str, str)
+    def renderScene(self, stage, tag, cam):
+        cmd = '"C:\\Program Files\\Autodesk\\Maya2016.5\\bin\\render.exe" -r rman'
+        project = ' -proj "\\\\awexpress.westphal.drexel.edu\digm_anfx\SRPJ_LAW"'
+        shadingRate = ' -setAttr ShadingRate 16'
+
+        if cam != '':
+            camera = ' -cam %s' % cam
+        else:
+            camera = ''
+
+        file = ' "%s"' % self.latestfile(stage, tag)
+
+        render_cmd = '%s%s%s%s%s' % (cmd, project, shadingRate, camera, file)
+        print render_cmd
+        # subprocess.Popen(render_cmd)
+        # return
 
 class LocalizeProject:
     def __init__(self):
@@ -182,6 +198,7 @@ def goUI():
     emitter.launch.connect(appLaunch.goLaunch)
     emitter.createnew.connect(appLaunch.goNewFile)
     emitter.openasset.connect(appLaunch.goAsset)
+    # emitter.renderscene.connect(appLaunch.renderScene)
 
     sys.exit(app.exec_())
 

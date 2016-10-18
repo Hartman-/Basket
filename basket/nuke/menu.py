@@ -93,7 +93,7 @@ def saveserverscript():
     if not os.path.isdir(config.nukeDir()):
         print('what do?')
     else:
-        serverDir = os.path.join(config.serverDir(), os.getenv('SHOW'), 'Working', os.getenv('SEQ'), os.getenv('SHOT'), '07. Comp')
+        serverDir = os.path.join(config.serverDir(), 'working', os.getenv('SEQ'), os.getenv('SHOT'), '07. Comp')
         nkName = os.path.basename(nuke.root().knob('name').value())
         desc = nkName.split('_')[2]
         fileVersion = int(re.search(r'[vV]\d+', os.path.split(nkName)[1]).group().lstrip('vV'))

@@ -3,8 +3,14 @@ import os
 import re
 from time import strftime
 
+from shiboken import wrapInstance
+
 import maya.cmds as cmds
 from maya.mel import eval
+import maya.OpenMayaUI as omui
+
+from PySide import QtCore
+from PySide import QtGui
 
 import BasketGlobals as config
 
@@ -15,9 +21,9 @@ def setProjectDirectory():
 
 
 def setupRenderEnvironment():
-    cmds.loadPlugin('RenderMan_For_Maya', quiet=True)
-    cmds.pluginInfo('RenderMan_For_Maya', edit=True, autoload=True)
-    cmds.setAttr('defaultRenderGlobals.ren', 'RenderMan/RIS', type='string')
+    # cmds.loadPlugin('RenderMan_For_Maya', quiet=True)
+    # cmds.pluginInfo('RenderMan_For_Maya', edit=True, autoload=True)
+    # cmds.setAttr('defaultRenderGlobals.ren', 'RenderMan/RIS', type='string')
     cmds.setAttr("defaultRenderGlobals.imageFilePrefix", "/../../../frames/%s/%s/cg/frame" % (os.getenv('SEQ'), os.getenv('SHOT')), type='string')
 
 
@@ -196,8 +202,160 @@ def scene_Reference(*args):
     publishRef = cmds.file(maFile, r=True, returnNewNodes=True, namespace=namespace)
 
 
+def maya_main_window():
+    maya_ptr = omui.MQtUtil.mainWindow()
+    return wrapInstance(long(maya_ptr), QtGui.QWidget)
+
+
+class RenderDialog(QtGui.QDialog):
+    def __init__(self, parent=maya_main_window()):
+        super(RenderDialog, self).__init__(parent)
+
+        # Default Values
+        self.cmd = '"C:\\Program Files\\Autodesk\\Maya2016.5\\bin\\render.exe" -r rman'
+        self.project = ' -proj "\\\\awexpress.westphal.drexel.edu\digm_anfx\SRPJ_LAW"'
+
+        self.camera = 'persp'
+        self.startFrame = cmds.getAttr('defaultRenderGlobals.startFrame')
+        self.endFrame = cmds.getAttr('defaultRenderGlobals.endFrame')
+        # rlayer = 'master'
+        self.numChunks = 1
+        self.namePrefix = cmds.getAttr('defaultRenderGlobals.imageFilePrefix')
+        self.shadingRate = 16
+        self.resWidth = cmds.getAttr('defaultResolution.width')
+        self.resHeight = cmds.getAttr('defaultResolution.height')
+
+        lprefix = QtGui.QLabel('Image Prefix')
+        self.opprefix = QtGui.QLineEdit()
+        self.opprefix.setText(str(self.namePrefix))
+        prefixLayout = QtGui.QHBoxLayout()
+        prefixLayout.addWidget(lprefix)
+        prefixLayout.addWidget(self.opprefix)
+
+        lcamera = QtGui.QLabel('Camera')
+        self.opcamera = QtGui.QLineEdit()
+        self.opcamera.setText(str(self.camera))
+        camLayout = QtGui.QHBoxLayout()
+        camLayout.addWidget(lcamera)
+        camLayout.addWidget(self.opcamera)
+
+        lstartf = QtGui.QLabel('Start Frame')
+        self.opstartf = QtGui.QLineEdit()
+        self.opstartf.setText(str(int(self.startFrame)))
+        startfLayout = QtGui.QHBoxLayout()
+        startfLayout.addWidget(lstartf)
+        startfLayout.addWidget(self.opstartf)
+
+        lendf = QtGui.QLabel('End Frame')
+        self.opendf = QtGui.QLineEdit()
+        self.opendf.setText(str(int(self.endFrame)))
+        endfLayout = QtGui.QHBoxLayout()
+        endfLayout.addWidget(lendf)
+        endfLayout.addWidget(self.opendf)
+
+        lchunk = QtGui.QLabel('# of Chunks')
+        self.opchunks = QtGui.QLineEdit()
+        self.opchunks.setText(str(self.numChunks))
+        chunkLayout = QtGui.QHBoxLayout()
+        chunkLayout.addWidget(lchunk)
+        chunkLayout.addWidget(self.opchunks)
+
+        lres = QtGui.QLabel('Resolution')
+        self.opresw = QtGui.QLineEdit()
+        self.opresw.setText(str(self.resWidth))
+        self.opresh = QtGui.QLineEdit()
+        self.opresh.setText(str(self.resHeight))
+        resLayout = QtGui.QHBoxLayout()
+        resLayout.addWidget(lres)
+        resLayout.addWidget(self.opresw)
+        resLayout.addWidget(self.opresh)
+
+        lshading = QtGui.QLabel('Shading Rate')
+        self.opshading = QtGui.QLineEdit()
+        self.opshading.setText(str(self.shadingRate))
+        shadingLayout = QtGui.QHBoxLayout()
+        shadingLayout.addWidget(lshading)
+        shadingLayout.addWidget(self.opshading)
+
+        btn_generate = QtGui.QPushButton('Generate')
+        btn_generate.clicked.connect(self.generate_scripts)
+        btn_clear = QtGui.QPushButton('Clear')
+        cmdLayout = QtGui.QHBoxLayout()
+        cmdLayout.addWidget(btn_generate)
+        cmdLayout.addWidget(btn_clear)
+
+        cmd_text = QtGui.QTextEdit()
+
+        windowLayout = QtGui.QVBoxLayout()
+        windowLayout.addLayout(prefixLayout)
+        windowLayout.addLayout(camLayout)
+        windowLayout.addLayout(startfLayout)
+        windowLayout.addLayout(endfLayout)
+        windowLayout.addLayout(chunkLayout)
+        windowLayout.addLayout(resLayout)
+        windowLayout.addLayout(shadingLayout)
+        windowLayout.addLayout(cmdLayout)
+        windowLayout.addWidget(cmd_text)
+
+        self.setLayout(windowLayout)
+
+    def batch_frame_ranges(self, startf, endf, numchunks):
+        ranges = []
+
+        # Start a while loop to construct each flag string
+        i = startf
+        while i <= numchunks:
+            frange = ' -s %s -e %s -b %s' % (i, endf, numchunks)
+            ranges.append(frange)
+            i += 1
+
+        # return list of flag strings
+        return ranges
+
+    def generate_scripts(self):
+        filePath = cmds.file(query=True, sceneName=True)
+
+        chunks = self.batch_frame_ranges(
+            int(self.opstartf.text()),
+            int(self.opendf.text()),
+            int(self.opchunks.text())
+        )
+
+        scripts = []
+
+        for index, chunk in enumerate(chunks):
+            script = '%s%s -im %s -fnc name.#.ext -of OpenEXR -pad 4 -cam %s -res %s %s%s -setAttr ShadingRate %s "%s"' % (
+                self.cmd,
+                self.project,
+                self.opprefix.text(),
+                self.opcamera.text(),
+                self.opresw.text(),
+                self.opresh.text(),
+                chunk,
+                self.opshading.text(),
+                filePath
+            )
+            scripts.append(script)
+
+            batpath = os.path.join(os.path.expanduser('~'), '%s_RenderBat.bat' % index)
+            file = open(batpath, 'a')
+            file.write(script + ' \n')
+            file.close()
+
+
+        print scripts
+
+
+def render_Batch(*args):
+    ui = RenderDialog()
+    ui.show()
+
+
 def main():
     cmds.menu(label='LAW', tearOff=True, parent='MayaWindow')
+
+    # cmds.menuItem(divider=True, dividerLabel='Manage')
+    # cmds.menuItem(label='Change Shot', command=switch_shot)
 
     cmds.menuItem(divider=True, dividerLabel='Save')
     cmds.menuItem(label='Easy Save', command=easy_save)
@@ -213,6 +371,9 @@ def main():
 
     # cmds.menuItem(divider=True, dividerLabel='Submit')
     # cmds.menuItem(label='Submit to Qube')
+
+    cmds.menuItem(divider=True, dividerLabel='Render')
+    cmds.menuItem(label='Generate Batch Script', command=render_Batch)
 
     setProjectDirectory()
     setupRenderEnvironment()

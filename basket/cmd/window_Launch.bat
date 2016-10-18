@@ -5,3 +5,4 @@
 @SET SHOW=ALAW
 @CD /d X:\Classof2017\LobstersAreWeird\basket
 @python BasketLauncher.py
+pause

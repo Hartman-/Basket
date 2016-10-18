@@ -94,7 +94,7 @@ def nukeDir():
 
 
 def serverStageDir(stage):
-    curDir = os.path.join(serverDir(), 'working', 'scenes', os.getenv('SEQ'), os.getenv('SHOT'), stage)
+    curDir = os.path.join(serverDir(), 'working', 'scenes', os.getenv('SEQ'), os.getenv('SHOT'), STAGE_DIRS[stage])
     if not os.path.isdir(curDir):
         raise ValueError, 'Stage Directory does not exist'
     return curDir
@@ -108,10 +108,9 @@ def localFramesDir():
 
 
 def stageDir(stage):
-    stages = ['01. PreVis', '02. Layout', '03. Anim', '04. FX', '05. Lighting', '06. Render', '07. Comp', '08. Edit']
     baseDir = os.path.join(serverDir(), 'working', 'scenes', os.getenv('SEQ'), os.getenv('SHOT'))
     # Thanks for starting at Zero lists!
-    curDir = os.path.join(baseDir, stages[stage - 1])
+    curDir = os.path.join(baseDir, STAGE_DIRS[stage])
 
     if not os.path.isdir(curDir):
         raise ValueError, 'File Directory does not exist: ' + curDir
@@ -170,7 +169,7 @@ def setStage(stage):
 
 
 def stageNum():
-    return int(os.getenv('STAGE')) - 1
+    return int(os.getenv('STAGE'))
 
 
 def applicationPath(ext):
@@ -185,14 +184,14 @@ def applicationPath(ext):
         return paths[ext]
     else:
         paths = {
+            0: 'C:\\Program Files\\Autodesk\\Maya2016.5\\bin\\maya.exe',
             1: 'C:\\Program Files\\Autodesk\\Maya2016.5\\bin\\maya.exe',
             2: 'C:\\Program Files\\Autodesk\\Maya2016.5\\bin\\maya.exe',
-            3: 'C:\\Program Files\\Autodesk\\Maya2016.5\\bin\\maya.exe',
-            4: 'C:\\Program Files\\Side Effects Software\\Houdini 15.5.565\\bin\\houdinifx.exe',
+            3: 'C:\\Program Files\\Side Effects Software\\Houdini 15.5.565\\bin\\houdinifx.exe',
+            4: 'C:\\Program Files\\Autodesk\\Maya2016.5\\bin\\maya.exe',
             5: 'C:\\Program Files\\Autodesk\\Maya2016.5\\bin\\maya.exe',
-            6: 'C:\\Program Files\\Autodesk\\Maya2016.5\\bin\\maya.exe',
-            7: 'C:\\Program Files\\Nuke10.0v4\\Nuke10.0.exe',
-            8: 'C:\\Program Files\\Adobe\\Adobe Premiere Pro CC 2015\\Adobe Premiere Pro.exe'
+            6: 'C:\\Program Files\\Nuke10.0v4\\Nuke10.0.exe',
+            7: 'C:\\Program Files\\Adobe\\Adobe Premiere Pro CC 2015\\Adobe Premiere Pro.exe'
         }
         return paths[ext]
 

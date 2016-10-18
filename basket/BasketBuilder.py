@@ -99,6 +99,14 @@ def rep_prod_dir():
                 os.path.join(LOCAL, 'working', 'scenes', mdir),
                 ignore=ignore_files)
 
+    for sdir in next(os.walk(os.path.join(SERVER, 'working', 'scenes')))[1]:
+        for shot in next(os.walk(os.path.join(SERVER, 'working', 'scenes', sdir)))[1]:
+            if not os.path.exists(os.path.join(LOCAL, 'working', 'scenes', sdir, shot)):
+                shutil.copytree(
+                    os.path.join(SERVER, 'working', 'scenes', sdir, shot),
+                    os.path.join(LOCAL, 'working', 'scenes', sdir, shot),
+                    ignore=ignore_files)
+
 
 if __name__ == "__main__":
     rep_prod_dir()

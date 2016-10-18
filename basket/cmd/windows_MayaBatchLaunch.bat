@@ -1,4 +1,1 @@
-@SET HOUDINI_OTLSCAN_PATH=$HOUDINI_OTLSCAN_PATH;X:\Classof2017\LobstersAreWeird\basket\otls
-@CD C:\Program Files\Side Effects Software\Houdini 15.5.565\bin
-@start houdinifx.exe
-@exit
+"C:\Program Files\Autodesk\Maya2016.5\bin\render.exe" -r rman -setAttr ShadingRate 16 -cam cam_020 -s 1 -e 5 "die\020\01. PreVis\die_020_blockingFloating_v01_PreVis_imh29.ma"\\awexpress.westphal.drexel.edu\digm_anfx\SRPJ_LAW\working\scenes\
