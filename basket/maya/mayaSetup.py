@@ -15,14 +15,18 @@ from PySide import QtGui
 import BasketGlobals as config
 
 
+L_COLUMN_WIDTH = 100
+R_COLUMN_WIDTH = 160
+
+
 def setProjectDirectory():
     root = config.serverDir()
     cmds.workspace(root, o=True)
 
 
 def setupRenderEnvironment():
-    # cmds.loadPlugin('RenderMan_For_Maya', quiet=True)
-    # cmds.pluginInfo('RenderMan_For_Maya', edit=True, autoload=True)
+    # cmds.loadPlugin('RenderMan_For_Maya.mll', quiet=True)
+    # cmds.pluginInfo('RenderMan_For_Maya.mll', edit=True, autoload=True)
     # cmds.setAttr('defaultRenderGlobals.ren', 'RenderMan/RIS', type='string')
     cmds.setAttr("defaultRenderGlobals.imageFilePrefix", "/../../../frames/%s/%s/cg/frame" % (os.getenv('SEQ'), os.getenv('SHOT')), type='string')
 
@@ -51,6 +55,7 @@ def easy_save(*args):
     if variable == 'OK':
         text = cmds.promptDialog(query=True, text=True)
         f_easySave(text)
+
 
 
 # Adding the file incrementation functionality that Maya should have
@@ -84,17 +89,30 @@ def easy_iterate(*args):
 def f_easySave(desc, ver=1):
     fileSaved = False
     version = ver
-    while not fileSaved:
-        stageName = config.STAGE_DIRS[config.stageNum()].split(' ')[1]
-        mayaName = '%s_%s_%s_v%02d_%s_%s.ma' % (os.getenv('SEQ'), os.getenv('SHOT'), desc, version, stageName, getpass.getuser())
-        mayaPath = os.path.join(config.stageDir(config.stageNum()), mayaName)
-        if os.path.isfile(mayaPath):
-            version += 1
-            continue
-        cmds.file(rename=mayaPath)
-        cmds.file(save=True, type='mayaAscii')
-        fileSaved = True
-    return mayaPath
+
+    if os.getenv('SEQ') != 'assets':
+        while not fileSaved:
+            stageName = config.STAGE_DIRS[config.stageNum()].split(' ')[1]
+            mayaName = '%s_%s_%s_v%02d_%s_%s.ma' % (os.getenv('SEQ'), os.getenv('SHOT'), desc, version, stageName, getpass.getuser())
+            mayaPath = os.path.join(config.stageDir(config.stageNum()), mayaName)
+            if os.path.isfile(mayaPath):
+                version += 1
+                continue
+            cmds.file(rename=mayaPath)
+            cmds.file(save=True, type='mayaAscii')
+            fileSaved = True
+        return mayaPath
+    else:
+        while not fileSaved:
+            mayaName = '%s_v%02d_%s.ma' % (desc, version, getpass.getuser())
+            mayaPath = os.path.join(config.serverDir(), 'working', os.getenv('SEQ'), os.getenv('SHOT'), mayaName)
+            if os.path.isfile(mayaPath):
+                version += 1
+                continue
+            cmds.file(rename=mayaPath)
+            cmds.file(save=True, type='mayaAscii')
+            fileSaved = True
+        return mayaPath
 
 
 def asset_Publish(*args):
@@ -107,19 +125,19 @@ def asset_Publish(*args):
         dismissString='Cancel').replace(' ', '')
     if var == 'OK':
         desc = cmds.promptDialog(query=True, text=True)
-        abcName = '%s_%s_%s.abc' % ('asset', desc, getpass.getuser())
+        # abcName = '%s_%s_%s.abc' % ('asset', desc, getpass.getuser())
         fbxName = '%s_%s_%s.fbx' % ('asset', desc, getpass.getuser())
 
-        fileAbc = os.path.join(config.libraryDir('models'), desc, abcName).replace('\\', '/')
+        # fileAbc = os.path.join(config.libraryDir('models'), desc, abcName).replace('\\', '/')
         fileFbx = os.path.join(config.libraryDir('models'), desc, fbxName).replace('\\', '/')
-        createDirs(fileAbc)
+        createDirs(fileFbx)
         selected = cmds.ls(selection=True)
         liststring = ''
         for i, o in enumerate(selected):
             liststring += '-root |'+str(o)+' '
-        eval('AbcExport -j "-frameRange 1 1 -uvWrite -writeFaceSets -writeUVSets -dataFormat ogawa %s -file %s";' % (liststring, fileAbc))
+        # eval('AbcExport -j "-frameRange 1 1 -uvWrite -writeFaceSets -writeUVSets -dataFormat ogawa %s -file %s";' % (liststring, fileAbc))
         cmds.file(fileFbx, exportSelected=True, type='FBX export')
-        writeLocalLog(os.path.dirname(fileAbc), os.path.basename(cmds.file(query=True, sceneName=True)))
+        writeLocalLog(os.path.dirname(fileFbx), os.path.basename(cmds.file(query=True, sceneName=True)))
 
 
 def asset_Import(*args):
@@ -207,6 +225,22 @@ def maya_main_window():
     return wrapInstance(long(maya_ptr), QtGui.QWidget)
 
 
+class Label(QtGui.QLabel):
+    def __init__(self, text, parent=None):
+        super(Label, self).__init__(parent)
+        self.setFixedWidth(L_COLUMN_WIDTH)
+        self.setContentsMargins(0, 0, 5, 0)
+        self.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
+        self.setText(text)
+
+
+class Input(QtGui.QLineEdit):
+    def __init__(self, text, width=R_COLUMN_WIDTH, parent=None):
+        super(Input, self).__init__(parent)
+        self.setText(text)
+        self.setMaximumWidth(width)
+
+
 class RenderDialog(QtGui.QDialog):
     def __init__(self, parent=maya_main_window()):
         super(RenderDialog, self).__init__(parent)
@@ -214,7 +248,6 @@ class RenderDialog(QtGui.QDialog):
         # Default Values
         self.cmd = '"C:\\Program Files\\Autodesk\\Maya2016.5\\bin\\render.exe" -r rman'
         self.project = ' -proj "\\\\awexpress.westphal.drexel.edu\digm_anfx\SRPJ_LAW"'
-
         self.camera = 'persp'
         self.startFrame = cmds.getAttr('defaultRenderGlobals.startFrame')
         self.endFrame = cmds.getAttr('defaultRenderGlobals.endFrame')
@@ -225,54 +258,55 @@ class RenderDialog(QtGui.QDialog):
         self.resWidth = cmds.getAttr('defaultResolution.width')
         self.resHeight = cmds.getAttr('defaultResolution.height')
 
-        lprefix = QtGui.QLabel('Image Prefix')
-        self.opprefix = QtGui.QLineEdit()
-        self.opprefix.setText(str(self.namePrefix))
+        lprefix = Label('Image Prefix')
+        self.opprefix = Input(str(self.namePrefix))
         prefixLayout = QtGui.QHBoxLayout()
         prefixLayout.addWidget(lprefix)
         prefixLayout.addWidget(self.opprefix)
 
-        lcamera = QtGui.QLabel('Camera')
-        self.opcamera = QtGui.QLineEdit()
-        self.opcamera.setText(str(self.camera))
+        lcamera = Label('Camera')
+        self.opcamera = QtGui.QComboBox()
+
+        cameras = cmds.listCameras()
+        for index, cam in enumerate(cameras):
+            self.opcamera.addItem(cam)
+            if cmds.getAttr(cam + '.renderable'):
+                self.opcamera.setCurrentIndex(index)
+
         camLayout = QtGui.QHBoxLayout()
         camLayout.addWidget(lcamera)
         camLayout.addWidget(self.opcamera)
 
-        lstartf = QtGui.QLabel('Start Frame')
-        self.opstartf = QtGui.QLineEdit()
-        self.opstartf.setText(str(int(self.startFrame)))
+        lstartf = Label('Start Frame')
+        self.opstartf = Input(str(int(self.startFrame)))
         startfLayout = QtGui.QHBoxLayout()
         startfLayout.addWidget(lstartf)
         startfLayout.addWidget(self.opstartf)
 
-        lendf = QtGui.QLabel('End Frame')
-        self.opendf = QtGui.QLineEdit()
-        self.opendf.setText(str(int(self.endFrame)))
+        lendf = Label('End Frame')
+        self.opendf = Input(str(int(self.endFrame)))
         endfLayout = QtGui.QHBoxLayout()
         endfLayout.addWidget(lendf)
         endfLayout.addWidget(self.opendf)
 
-        lchunk = QtGui.QLabel('# of Chunks')
-        self.opchunks = QtGui.QLineEdit()
-        self.opchunks.setText(str(self.numChunks))
+        lchunk = Label('# of Chunks')
+        self.opchunks = Input(str(self.numChunks))
         chunkLayout = QtGui.QHBoxLayout()
         chunkLayout.addWidget(lchunk)
         chunkLayout.addWidget(self.opchunks)
 
-        lres = QtGui.QLabel('Resolution')
-        self.opresw = QtGui.QLineEdit()
-        self.opresw.setText(str(self.resWidth))
-        self.opresh = QtGui.QLineEdit()
-        self.opresh.setText(str(self.resHeight))
+        inputWidth = (R_COLUMN_WIDTH/2) - 9
+
+        lres = Label('Resolution')
+        self.opresw = Input(str(self.resWidth), width=inputWidth)
+        self.opresh = Input(str(self.resHeight), width=inputWidth)
         resLayout = QtGui.QHBoxLayout()
         resLayout.addWidget(lres)
         resLayout.addWidget(self.opresw)
         resLayout.addWidget(self.opresh)
 
-        lshading = QtGui.QLabel('Shading Rate')
-        self.opshading = QtGui.QLineEdit()
-        self.opshading.setText(str(self.shadingRate))
+        lshading = Label('Shading Rate')
+        self.opshading = Input(str(self.shadingRate))
         shadingLayout = QtGui.QHBoxLayout()
         shadingLayout.addWidget(lshading)
         shadingLayout.addWidget(self.opshading)
@@ -280,11 +314,12 @@ class RenderDialog(QtGui.QDialog):
         btn_generate = QtGui.QPushButton('Generate')
         btn_generate.clicked.connect(self.generate_scripts)
         btn_clear = QtGui.QPushButton('Clear')
+        btn_clear.clicked.connect(self.clear_scripts)
         cmdLayout = QtGui.QHBoxLayout()
         cmdLayout.addWidget(btn_generate)
         cmdLayout.addWidget(btn_clear)
 
-        cmd_text = QtGui.QTextEdit()
+        self.cmd_text = QtGui.QTextEdit()
 
         windowLayout = QtGui.QVBoxLayout()
         windowLayout.addLayout(prefixLayout)
@@ -295,7 +330,7 @@ class RenderDialog(QtGui.QDialog):
         windowLayout.addLayout(resLayout)
         windowLayout.addLayout(shadingLayout)
         windowLayout.addLayout(cmdLayout)
-        windowLayout.addWidget(cmd_text)
+        windowLayout.addWidget(self.cmd_text)
 
         self.setLayout(windowLayout)
 
@@ -313,6 +348,7 @@ class RenderDialog(QtGui.QDialog):
         return ranges
 
     def generate_scripts(self):
+        self.clear_scripts()
         filePath = cmds.file(query=True, sceneName=True)
 
         chunks = self.batch_frame_ranges(
@@ -328,7 +364,7 @@ class RenderDialog(QtGui.QDialog):
                 self.cmd,
                 self.project,
                 self.opprefix.text(),
-                self.opcamera.text(),
+                self.opcamera.currentText(),
                 self.opresw.text(),
                 self.opresh.text(),
                 chunk,
@@ -336,8 +372,10 @@ class RenderDialog(QtGui.QDialog):
                 filePath
             )
             scripts.append(script)
+            self.cmd_text.append(script + ' \n')
 
-            batpath = os.path.join(os.path.expanduser('~'), '%s_RenderBat.bat' % index)
+            noDocuments = os.path.expanduser('~').replace('/', '\\').replace('\\Documents', '')
+            batpath = os.path.join(noDocuments, 'Desktop', '%s_%s_%s_RenderBat.bat' % (os.getenv('SEQ'), self.opcamera.currentText(), index))
             file = open(batpath, 'a')
             file.write(script + ' \n')
             file.close()
@@ -345,9 +383,13 @@ class RenderDialog(QtGui.QDialog):
 
         print scripts
 
+    def clear_scripts(self):
+        self.cmd_text.clear()
+
 
 def render_Batch(*args):
     ui = RenderDialog()
+    ui.setWindowTitle('Generate Batch Script')
     ui.show()
 
 
@@ -367,7 +409,7 @@ def main():
 
     cmds.menuItem(divider=True, dividerLabel='Export')
     cmds.menuItem(label='Publish Scene', command=scene_Publish)
-    # cmds.menuItem(label='Publish Asset', command=asset_Publish)
+    cmds.menuItem(label='Publish Asset', command=asset_Publish)
 
     # cmds.menuItem(divider=True, dividerLabel='Submit')
     # cmds.menuItem(label='Submit to Qube')

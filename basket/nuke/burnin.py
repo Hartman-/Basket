@@ -8,7 +8,6 @@
 # Import Modules 
 import nuke
 import os
-import time
 
 
 def normframerange(inbegin, inend):
@@ -35,7 +34,12 @@ class RectNode:
 
         self.rectNode = nuke.createNode('Rectangle', inpanel=False)
         self.rectNode['name'].setValue(self.Name)
-        self.rectNode['area'].setValue(self.Area)
+
+        self.rectNode['area'].setExpression(str(self.Area[0]), 0)
+        self.rectNode['area'].setExpression(str(self.Area[1]), 1)
+        self.rectNode['area'].setExpression(str(self.Area[2]), 2)
+        self.rectNode['area'].setExpression(str(self.Area[3]), 3)
+
         self.rectNode['color'].setValue(self.Color)
         self.rectNode['opacity'].setValue(self.Opacity)
 
@@ -43,8 +47,8 @@ class RectNode:
             self.rectNode['ramp'].setValue('linear')
             self.rectNode['color'].setValue(0)
             self.rectNode['color0'].setValue(1)
-            self.rectNode['p1'].setValue([0, 200])
-            self.rectNode['p0'].setValue([1400, 200])
+            self.rectNode['p1'].setValue([0, 50])
+            self.rectNode['p0'].setValue([500, 50])
 
         self.rectNode.setInput(0, self.Input)
 
@@ -66,11 +70,17 @@ class TextNode:
         self.textNode = nuke.createNode('Text', inpanel=False)
         self.textNode['name'].setValue(self.Name)
         self.textNode['size'].setValue(self.Size)
-        self.textNode['box'].setValue(self.Box)
+
+        self.textNode['box'].setExpression(str(self.Box[0]), 0)
+        self.textNode['box'].setExpression(str(self.Box[1]), 1)
+        self.textNode['box'].setExpression(str(self.Box[2]), 2)
+        self.textNode['box'].setExpression(str(self.Box[3]), 3)
+
         self.textNode['xjustify'].setValue(self.xJustify)
         self.textNode.setInput(0, self.Input)
         self.textNode.addKnob(k_String)
-        self.frameHeight = nuke.root().format().height()
+
+        self.height = int(nuke.root().height())
 
         if (Alt == True):
             self.textNode[textString].setValue(self.Message)
@@ -99,29 +109,32 @@ class TextNode:
         if (self.Name == 'SlateComment'):
             self.textNode['yjustify'].setValue('top')
 
-        if (self.Resize == True):
-            print self.Box[0]
-            # [0, 980, (frameWidth/2), 1080]
-            self.textNode['box'].setExpression(
-                '[python {nuke.toNode("pRect").knob("area").value()[0] + ' + str(self.Box[0]) + '}]', 0)
-            self.textNode['box'].setExpression(
-                '[python {nuke.toNode("pRect").knob("area").value()[1] + ' + str(self.Box[1]) + '}]', 1)
-            self.textNode['box'].setExpression(
-                '[python {nuke.toNode("pRect").knob("area").value()[3] - ' + str(self.frameHeight - self.Box[3]) + '}]',
-                3)
+        # if (self.Resize == True):
+        #     print self.Box[0]
+        #     # [0, 980, (rootWidth/2), 1080]
+        #     self.textNode['box'].setExpression(
+        #         '[python {nuke.toNode("pRect").knob("area").value()[0] + ' + str(self.Box[0]) + '}]', 0)
+        #     self.textNode['box'].setExpression(
+        #         '[python {nuke.toNode("pRect").knob("area").value()[1] + ' + str(self.Box[1]) + '}]', 1)
+        #     self.textNode['box'].setExpression(
+        #         '[python {nuke.toNode("pRect").knob("area").value()[3] - ' + str(self.height - self.Box[3]) + '}]',
+        #         3)
 
 
 def dropBurnIn():
     # Define Variables
-    localTime = time.asctime(time.localtime(time.time()))
-
     nukeRoot = nuke.root()
+
+    rootWidth = 'root.width'
+    rootHeight = 'root.height'
+
+    zeroWidth = 'root.width - root.width'
+    zeroHeight = 'root.height - root.height'
+
+    halfWidth = 'root.width / 2'
 
     proj_Format = nukeRoot.format()
     proj_Comments = nukeRoot['label'].getValue()
-
-    frameHeight = int(proj_Format.height())
-    frameWidth = int(proj_Format.width())
 
     origFrameRange = nuke.FrameRange()
     origFrameRange.setLast(int(nukeRoot['last_frame'].getValue()))
@@ -147,8 +160,6 @@ def dropBurnIn():
     k_ShotName.setLink('root.BurnIn.ShotName.ShotName_text')
     k_Notes = nuke.Multiline_Eval_String_Knob('notes', 'notes')
 
-    k_fontPath = nuke.String_Knob('fontpath', 'fontpath', 'Library/Fonts/SourceSansPro-Regular.otf')
-
     k_ShowFileName = nuke.Link_Knob('disable_filename', 'disable filename')
     k_ShowFileName.setLink('root.BurnIn.Filename.disable')
     k_ShowShotName = nuke.Link_Knob('disable_shot', 'disable shot name')
@@ -157,9 +168,6 @@ def dropBurnIn():
     k_ShowAuthorName.setLink('root.BurnIn.AuthorName.disable')
     k_ShowFrameCounter = nuke.Link_Knob('disable_frame', 'disable counter')
     k_ShowFrameCounter.setLink('root.BurnIn.FrameCounter.disable')
-
-    k_firstFrame = nuke.Int_Knob('first_frame', 'first_frame')
-    k_lastFrame = nuke.Int_Knob('last_frame', 'last_frame')
 
     refreshCode = """
 nuke.toNode("BurnIn").knob("disable").setValue(True)
@@ -175,13 +183,10 @@ nuke.toNode("BurnIn").knob("disable").setValue(False)
     n_burnInGroup.addKnob(k_Notes)
 
     n_burnInGroup.addKnob(k_CtrlTab)
-    n_burnInGroup.addKnob(k_fontPath)
     n_burnInGroup.addKnob(k_ShowFileName)
     n_burnInGroup.addKnob(k_ShowShotName)
     n_burnInGroup.addKnob(k_ShowAuthorName)
     n_burnInGroup.addKnob(k_ShowFrameCounter)
-    n_burnInGroup.addKnob(k_firstFrame)
-    n_burnInGroup.addKnob(k_lastFrame)
     n_burnInGroup.addKnob(k_refreshBurnIn)
 
     n_burnInGroup.begin()
@@ -207,13 +212,13 @@ nuke.toNode("BurnIn").knob("disable").setValue(False)
 
     # Build Rectangle Overlays
     n_topRect = RectNode('TopOverlay',
-                         [0, frameHeight, frameWidth, frameHeight - 100],
+                         [zeroWidth, 'root.height - 100', rootWidth, rootHeight],
                          0,
                          0.5,
                          False,
                          n_timecode)
     n_botRect = RectNode('BotOverlay',
-                         [0, 100, frameWidth, 0], 0, 0.5,
+                         [zeroWidth, zeroHeight, rootWidth, 100], 0, 0.5,
                          False,
                          n_topRect.rectNode)
 
@@ -223,8 +228,8 @@ nuke.toNode("BurnIn").knob("disable").setValue(False)
     #                     'Drexel University',
     #                     False,
     #                     30,
-    #                     [25, frameHeight - 100, frameWidth, frameHeight],
-    #                     False,
+    #                     [25, 'root.height- 100,' rootWidth, 'root.height,
+    ''#                     False,
     #                     'left',
     #                     n_botRect.rectNode)
 
@@ -232,7 +237,7 @@ nuke.toNode("BurnIn").knob("disable").setValue(False)
                               '[python {int(burnin.curnormframe(nuke.root().knob("first_frame").value()))}]/[python {int(burnin.normframerange(nuke.root().knob("first_frame").value(),nuke.root().knob("last_frame").value())[1])}] ([python {nuke.frame()}])',
                               False,
                               30,
-                              [frameWidth - 200, 0, frameWidth, 100],
+                              ['root.width - 200', zeroHeight, rootWidth, 100],
                               False,
                               'center',
                               n_botRect.rectNode)
@@ -241,7 +246,7 @@ nuke.toNode("BurnIn").knob("disable").setValue(False)
                           'Hello World',
                           True,
                           30,
-                          [25, 0, frameWidth, 100],
+                          [25, zeroHeight, rootWidth, 100],
                           False,
                           'left',
                           n_frameCounter.textNode)
@@ -250,7 +255,7 @@ nuke.toNode("BurnIn").knob("disable").setValue(False)
                           "[string trimleft [string trim [value root.name] .nk] [file dirname [value root.name]]]",
                           False,
                           30,
-                          [0, frameHeight - 100, frameWidth, frameHeight],
+                          [0, 'root.height - 100', rootWidth, rootHeight],
                           False,
                           'center',
                           n_shotName.textNode)
@@ -259,13 +264,13 @@ nuke.toNode("BurnIn").knob("disable").setValue(False)
                             'YOUR NAME HERE',
                             True,
                             30,
-                            [0, 0, frameWidth, 100],
+                            [zeroWidth, zeroHeight, rootWidth, 100],
                             False,
                             'center',
                             n_fileName.textNode)
 
     n_Rect = RectNode('pRect',
-                      [25, 0, frameWidth, frameHeight - 100],
+                      [25, zeroHeight, rootWidth, 'root.height - 100'],
                       0,
                       0,
                       False,
@@ -275,16 +280,16 @@ nuke.toNode("BurnIn").knob("disable").setValue(False)
     #                           'Drexel University',
     #                           False,
     #                           50,
-    #                           [0, frameHeight - 100, frameWidth, frameHeight],
-    #                           False,
+    #                           [0, 'root.height- 100,' rootWidth, 'root.height,
+    ''#                           False,
     #                           'center',
     #                           None)
 
     n_localTime = TextNode('LocalTime',
-                           'Date: ' + localTime,
+                           'Date: [date %D] [date %T]',
                            False,
                            50,
-                           [0, frameHeight - 100, (frameWidth / 2), frameHeight],
+                           [zeroWidth, 'root.height - 100', halfWidth, rootHeight],
                            True,
                            'left',
                            None)
@@ -293,7 +298,7 @@ nuke.toNode("BurnIn").knob("disable").setValue(False)
                                'Author: ',
                                False,
                                50,
-                               [0, frameHeight - 200, (frameWidth / 2), frameHeight - 100],
+                               [zeroWidth, 'root.height - 200', halfWidth, 'root.height - 100'],
                                True,
                                'left',
                                n_localTime.textNode)
@@ -302,7 +307,7 @@ nuke.toNode("BurnIn").knob("disable").setValue(False)
                              '[python {nuke.toNode("BurnIn").knob("author").getValue()}]',
                              True,
                              50,
-                             [175, frameHeight - 200, (frameWidth / 2), frameHeight - 100],
+                             [175, 'root.height - 200', halfWidth, 'root.height - 100'],
                              True,
                              'left',
                              n_slateAuthor_t.textNode)
@@ -311,7 +316,7 @@ nuke.toNode("BurnIn").knob("disable").setValue(False)
                              'Format: [python {nuke.root().format().name()}]',
                              True,
                              50,
-                             [0, frameHeight - 300, (frameWidth / 2), frameHeight - 200],
+                             [zeroWidth, 'root.height - 300', halfWidth, 'root.height - 200'],
                              True,
                              'left',
                              n_slateAuthor.textNode)
@@ -320,7 +325,7 @@ nuke.toNode("BurnIn").knob("disable").setValue(False)
                            'Shot: [python {nuke.toNode("BurnIn").knob("shot").getValue()}]',
                            False,
                            50,
-                           [0, frameHeight - 400, (frameWidth / 2), frameHeight - 300],
+                           [zeroWidth, 'root.height - 400', halfWidth, 'root.height - 300'],
                            True,
                            'left',
                            n_slateFormat.textNode)
@@ -329,7 +334,7 @@ nuke.toNode("BurnIn").knob("disable").setValue(False)
                             '[python {int(nuke.root().knob("first_frame").value())}] - [python {int(nuke.root().knob("last_frame").value())}]',
                             True,
                             50,
-                            [0, frameHeight - 500, (frameWidth / 2), frameHeight - 400],
+                            [zeroWidth, 'root.height - 500', halfWidth, 'root.height - 400'],
                             True,
                             'left',
                             n_slateShot.textNode)
@@ -338,7 +343,7 @@ nuke.toNode("BurnIn").knob("disable").setValue(False)
                                    'Comments: ',
                                    False,
                                    50,
-                                   [960, frameHeight - 100, frameWidth, frameHeight],
+                                   [halfWidth, 'root.height - 150', rootWidth, 'root.height - 50'],
                                    False,
                                    'left',
                                    n_slateRange.textNode)
@@ -347,24 +352,24 @@ nuke.toNode("BurnIn").knob("disable").setValue(False)
                               '[python {nuke.toNode("BurnIn").knob("notes").getValue()}]',
                               False,
                               50,
-                              [960, frameHeight - 100, frameWidth, frameHeight - 200],
+                              [halfWidth, 'root.height - 150', rootWidth, 'root.height - 250'],
                               False,
                               'left',
                               n_slateCommentTitle.textNode)
 
-    n_slateGrey = RectNode('greyTest', [0, 0, 200, 200], [0.5, 0.5, 0.5, 1], 1, False, n_slateComment.textNode)
-    n_slateYellow = RectNode('yellowTest', [200, 0, 400, 200], [0.5, 0.5, 0, 1], 1, False, n_slateGrey.rectNode)
-    n_slateCyan = RectNode('cyanTest', [400, 0, 600, 200], [0, 0.5, 0.5, 1], 1, False, n_slateYellow.rectNode)
-    n_slateGreen = RectNode('greenTest', [600, 0, 800, 200], [0, 0.5, 0, 1], 1, False, n_slateCyan.rectNode)
-    n_slatePurple = RectNode('purpleTest', [800, 0, 1000, 200], [0.5, 0, 0.5, 1], 1, False, n_slateGreen.rectNode)
-    n_slateRed = RectNode('redTest', [1000, 0, 1200, 200], [0.5, 0, 0, 1], 1, False, n_slatePurple.rectNode)
-    n_slateBlue = RectNode('blueTest', [1200, 0, 1400, 200], [0, 0, 0.5, 1], 1, False, n_slateRed.rectNode)
-    n_slateRamp = RectNode('greyRamp', [0, 200, 1400, 300], [0, 0, 0, 1], 1, True, n_slateBlue.rectNode)
+    n_slateGrey = RectNode('greyTest', [0, 0, 50, 50], [0.5, 0.5, 0.5, 1], 1, False, n_slateComment.textNode)
+    n_slateYellow = RectNode('yellowTest', [50, 0, 100, 50], [0.5, 0.5, 0, 1], 1, False, n_slateGrey.rectNode)
+    n_slateCyan = RectNode('cyanTest', [100, 0, 150, 50], [0, 0.5, 0.5, 1], 1, False, n_slateYellow.rectNode)
+    n_slateGreen = RectNode('greenTest', [150, 0, 200, 50], [0, 0.5, 0, 1], 1, False, n_slateCyan.rectNode)
+    n_slatePurple = RectNode('purpleTest', [200, 0, 250, 50], [0.5, 0, 0.5, 1], 1, False, n_slateGreen.rectNode)
+    n_slateRed = RectNode('redTest', [250, 0, 300, 50], [0.5, 0, 0, 1], 1, False, n_slatePurple.rectNode)
+    n_slateBlue = RectNode('blueTest', [300, 0, 350, 50], [0, 0, 0.5, 1], 1, False, n_slateRed.rectNode)
+    n_slateRamp = RectNode('greyRamp', [0, 50, 500, 75], [0, 0, 0, 1], 1, True, n_slateBlue.rectNode)
 
-    n_slateBlack = RectNode('blackTest', [1400, 200, 1920, 300], [0, 0, 0, 1], 1, False, n_slateRamp.rectNode)
-    n_slateMid = RectNode('midGreyTest', [1400, 100, 1920, 200], [0.5, 0.5, 0.5, 1], 1, False, n_slateBlack.rectNode)
-    n_slateWhite = RectNode('whiteTest', [1400, 0, 1920, 100], [1, 1, 1, 1], 1, False, n_slateMid.rectNode)
-    n_slateStrip = RectNode('whiteStrip', [0, 300, 1920, 310], [1, 1, 1, 1], 1, False, n_slateWhite.rectNode)
+    n_slateBlack = RectNode('blackTest', [350, 0, 400, 50], [0, 0, 0, 1], 1, False, n_slateRamp.rectNode)
+    n_slateMid = RectNode('midGreyTest', [400, 0, 450, 50], [0.5, 0.5, 0.5, 1], 1, False, n_slateBlack.rectNode)
+    n_slateWhite = RectNode('whiteTest', [450, 0, 500, 50], [1, 1, 1, 1], 1, False, n_slateMid.rectNode)
+    n_slateStrip = RectNode('whiteStrip', [0, 75, 500, 85], [1, 1, 1, 1], 1, False, n_slateWhite.rectNode)
 
     # Create switch
     n_switch = nuke.createNode("Switch", inpanel=False)
@@ -388,11 +393,7 @@ nuke.toNode("BurnIn").knob("disable").setValue(False)
     # k_DynFont.setValue(dynfont_code)
     # n_burnInGroup.addKnob(k_DynFont)
 
-    k_firstFrame.setValue(0)
-    k_lastFrame.setValue(111)
-
-
-# Add an AutoWrite option to the Image menu
+# Add an BurnIn option to the Image menu
 nuke.tprint('Adding BurnIn to Image menu.')
 menubar = nuke.menu('Nodes')
 m = menubar.findItem('Image')

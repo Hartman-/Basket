@@ -87,12 +87,21 @@ class Launcher:
             config.applicationPath(stage)
         )
 
-    @Slot(int, str)
+    @Slot(str)
     def goAsset(self, path):
-        config.setSeq('bkp')
-        config.setShot('NUKE')
+        config.setSeq('assets')
+        psuedoShot = os.path.dirname(path.strip(str(os.path.join(config.serverDir(), 'working', 'assets'))))
+        config.setShot(psuedoShot)
         filename, file_extension = os.path.splitext(path)
         self.launch(config.applicationPath(file_extension), path)
+
+    @Slot(str)
+    def goNewAsset(self, name):
+        config.setSeq('assets')
+        config.setShot(str(name))
+
+        BasketBuilder.make_dir(os.path.join('working', os.getenv('SEQ'), os.getenv('SHOT')))
+        self.createNewFile(config.applicationPath('.ma'))
 
     @Slot(int, str, str)
     def renderScene(self, stage, tag, cam):
@@ -191,13 +200,14 @@ def goUI():
 
     app = QApplication(sys.argv)
     gui = LauncherGUI.Launcher()
-    gui.setWindowTitle('LAW Launcher')
+    gui.setWindowTitle('LAWncher')
 
     emitter = gui.centralWidget()
 
     emitter.launch.connect(appLaunch.goLaunch)
     emitter.createnew.connect(appLaunch.goNewFile)
     emitter.openasset.connect(appLaunch.goAsset)
+    emitter.newasset.connect(appLaunch.goNewAsset)
     # emitter.renderscene.connect(appLaunch.renderScene)
 
     sys.exit(app.exec_())

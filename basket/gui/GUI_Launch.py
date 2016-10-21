@@ -18,6 +18,7 @@ class WindowLayout(QTabWidget):
     launch = Signal(int, str)
     createnew = Signal(int)
     openasset = Signal(str)
+    newasset = Signal(str)
     # renderscene = Signal(int, str, str)
 
     def __init__(self, parent=None):
@@ -175,8 +176,14 @@ class WindowLayout(QTabWidget):
         self.label_Directory.setAlignment(Qt.AlignLeft | Qt.AlignTop)
         self.text_Directory = QLineEdit()
 
-        self.btn_browse.clicked.connect(self.browseAssets)
+        self.label_AssetName = QLabel('Name: ')
+        self.text_AssetName = QLineEdit()
+        self.btn_NewAsset = QPushButton('New Asset')
+
         self.btn_AssetLaunch.clicked.connect(self.launchAsset)
+
+        self.btn_browse.clicked.connect(self.browseAssets)
+        self.btn_NewAsset.clicked.connect(self.launchNewAsset)
 
         assetLayout = QVBoxLayout()
 
@@ -189,8 +196,20 @@ class WindowLayout(QTabWidget):
         buttonLayout.addWidget(self.btn_AssetLaunch)
         inputLayout.addLayout(buttonLayout)
         inputLayout.addStretch(3)
+        inputLayout.setContentsMargins(0, 20, 0, 20)
+
+        newInput = QHBoxLayout()
+        newInput.addWidget(self.label_AssetName)
+        newInput.addWidget(self.text_AssetName)
+        newassetLayout = QVBoxLayout()
+        newassetLayout.addLayout(newInput)
+        newassetLayout.addWidget(self.btn_NewAsset)
+        newassetLayout.addStretch(3)
+        newassetLayout.setContentsMargins(0, 20, 0, 20)
 
         assetLayout.addLayout(inputLayout)
+        assetLayout.addWidget(line)
+        assetLayout.addLayout(newassetLayout)
 
         self.tabAssets.setLayout(assetLayout)
 
@@ -243,6 +262,12 @@ class WindowLayout(QTabWidget):
         print 'And I grabbed her by the cat'
         if self.text_Directory.text() != '':
             self.openasset.emit(self.text_Directory.text())
+
+    def launchNewAsset(self):
+        print 'CHINA'
+        if self.text_AssetName.text() != '':
+            self.newasset.emit(self.text_AssetName.text())
+            self.text_AssetName.clear()
 
     def updateDB(self):
         self.updateSceneList()
