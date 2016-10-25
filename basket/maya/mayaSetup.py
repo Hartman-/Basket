@@ -25,10 +25,13 @@ def setProjectDirectory():
 
 
 def setupRenderEnvironment():
-    # cmds.loadPlugin('RenderMan_For_Maya.mll', quiet=True)
-    # cmds.pluginInfo('RenderMan_For_Maya.mll', edit=True, autoload=True)
-    # cmds.setAttr('defaultRenderGlobals.ren', 'RenderMan/RIS', type='string')
-    cmds.setAttr("defaultRenderGlobals.imageFilePrefix", "/../../../frames/%s/%s/cg/frame" % (os.getenv('SEQ'), os.getenv('SHOT')), type='string')
+    if not cmds.pluginInfo('RenderMan_for_Maya.mll', query=True, loaded=True):
+        cmds.loadPlugin('RenderMan_for_Maya.mll', quiet=True)
+        cmds.pluginInfo('RenderMan_for_Maya.mll', edit=True, autoload=True)
+    if not cmds.pluginInfo('gpuCache.mll', query=True, loaded=True):
+        cmds.loadPlugin('gpuCache.mll', quiet=True)
+        cmds.pluginInfo('gpuCache.mll', edit=True, autoload=True)
+    cmds.setAttr("defaultRenderGlobals.imageFilePrefix", "frame", type='string')
 
 
 def createDirs(input):

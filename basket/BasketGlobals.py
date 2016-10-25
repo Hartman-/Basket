@@ -165,11 +165,11 @@ def setShot(shot):
 
 
 def setStage(stage):
-    os.environ['STAGE'] = str(stage)
+    os.environ['LAWSTAGE'] = str(stage)
 
 
 def stageNum():
-    return int(os.getenv('STAGE'))
+    return int(os.getenv('LAWSTAGE'))
 
 
 def applicationPath(ext):
