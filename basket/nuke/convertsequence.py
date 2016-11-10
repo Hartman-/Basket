@@ -6,6 +6,7 @@ nuke -t imageconvertwithargs.py myimage.####.tif myimage.####.jpg
 nuke -t imageconvertwithargs.py xyz 010 cg Ravine
 '''
 
+import time
 from glob import glob
 import os
 import re
@@ -40,7 +41,8 @@ ext = dirName[2]
 fileName = '%s.%s.%s' % (dirName[0], ('#'*padding), ext)
 filePath = os.path.join(dirPath, fileName).replace('\\', '/')
 
-writeName = '%s.%s' % (dirName[0], 'mov')
+date = time.strftime("%y%m%d")
+writeName = '%s_%s.%s' % (date, dirName[0], 'mov')
 writePath = os.path.join(dirPath, writeName).replace('\\', '/')
 
 # DEBUGGING
@@ -63,11 +65,12 @@ w.knob('mov64_fps').setValue(30)
 w.knob('meta_codec').setValue('jpeg')
 w.knob('mov64_units').setValue('Frames')
 w.knob('mov64_write_timecode').setValue(True)
-w.knob('mov64_bitrate').setValue(80000)
+w.knob('mov64_bitrate').setValue(115000)
+w.knob('mov64_bitrate_tolerance').setValue(40000)
 
 # Nuke with the reverse logic? ... Lower = Better
 w.knob('mov64_quality_min').setValue(2)
-w.knob('mov64_quality_max').setValue(6)
+w.knob('mov64_quality_max').setValue(4)
 
 w.setInput(0, r)
 nuke.execute("Write1", firstFrame, lastFrame)

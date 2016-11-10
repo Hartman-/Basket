@@ -56,8 +56,7 @@ class ArchiveDialog(QDialog):
                    '--nukex',
                    '-ti',
                    'X:/Classof2017/LobstersAreWeird/basket/nuke/convertsequence.py',
-                   path],
-                  creationflags=subprocess.CREATE_NEW_CONSOLE)
+                   path])
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

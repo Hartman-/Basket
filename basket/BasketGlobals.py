@@ -89,7 +89,7 @@ def getNukeScripts():
 def nukeDir():
     curDir = os.path.join(rootDir(), 'working', 'scenes', os.getenv('SEQ'), os.getenv('SHOT'), '07. Comp')
     if not os.path.isdir(curDir):
-        raise ValueError, 'NUKE Directory does not exist'
+        raise ValueError, '%s NUKE Directory does not exist' % curDir
     return curDir
 
 

@@ -1,10 +1,9 @@
 def setupDefault():
     # DEFINE EXAMPLE ENVIRONMENT
-    os.environ['SHOW'] = 'PROJ'
-    os.environ['SEQ'] = 'xyz'
+    os.environ['SEQ'] = 'abc'
     os.environ['SHOT'] = '010'
 
-if os.getenv('SEQ') is None or os.getenv('SHOT') is None or os.getenv('SHOW') is None:
+if os.getenv('SEQ') is None or os.getenv('SHOT') is None:
     setupDefault()
 
 

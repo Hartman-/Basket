@@ -20,8 +20,7 @@ R_COLUMN_WIDTH = 160
 
 
 def setProjectDirectory():
-    root = config.serverDir()
-    cmds.workspace(root, o=True)
+    cmds.workspace('\\\\awexpress.westphal.drexel.edu\\digm_anfx\\SRPJ_LAW', o=True)
 
 
 def setupRenderEnvironment():
@@ -31,6 +30,8 @@ def setupRenderEnvironment():
     if not cmds.pluginInfo('gpuCache.mll', query=True, loaded=True):
         cmds.loadPlugin('gpuCache.mll', quiet=True)
         cmds.pluginInfo('gpuCache.mll', edit=True, autoload=True)
+    if cmds.pluginInfo('Mayatomr.mll', query=True, loaded=True):
+        cmds.unloadPlugin('Mayatomr.mll', force=True)
     cmds.setAttr("defaultRenderGlobals.imageFilePrefix", "frame", type='string')
 
 
@@ -363,7 +364,11 @@ class RenderDialog(QtGui.QDialog):
         scripts = []
 
         for index, chunk in enumerate(chunks):
-            script = '%s%s -im %s -fnc name.#.ext -of OpenEXR -pad 4 -cam %s -res %s %s%s -setAttr ShadingRate %s "%s"' % (
+            imageDir = '{frames/%s/%s/cg}' % (os.getenv('SEQ'), os.getenv('SHOT'))
+            script = '@set SEQ=%s\n@set SHOT=%s\n@set %s\n%s%s -im %s -fnc name.#.ext -of OpenEXR -pad 4 -cam %s -res %s %s%s -setAttr ShadingRate %s "%s"' % (
+                os.getenv('SEQ'),
+                os.getenv('SHOT'),
+                'RMS_SCRIPT_PATHS=X:\\Classof2017\\LobstersAreWeird\\basket\\renderman',
                 self.cmd,
                 self.project,
                 self.opprefix.text(),
@@ -377,8 +382,13 @@ class RenderDialog(QtGui.QDialog):
             scripts.append(script)
             self.cmd_text.append(script + ' \n')
 
+            if ':' in self.opcamera.currentText():
+                cleanCam = self.opcamera.currentText().split(':')[1]
+            else:
+                cleanCam = self.opcamera.currentText()
+
             noDocuments = os.path.expanduser('~').replace('/', '\\').replace('\\Documents', '')
-            batpath = os.path.join(noDocuments, 'Desktop', '%s_%s_%s_RenderBat.bat' % (os.getenv('SEQ'), self.opcamera.currentText(), index))
+            batpath = os.path.join(noDocuments, 'Desktop', '%s_%s_%s_RenderBat.bat' % (os.getenv('SEQ'), cleanCam, index))
             file = open(batpath, 'a')
             file.write(script + ' \n')
             file.close()
