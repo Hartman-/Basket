@@ -30,6 +30,9 @@ def setupRenderEnvironment():
     if not cmds.pluginInfo('gpuCache.mll', query=True, loaded=True):
         cmds.loadPlugin('gpuCache.mll', quiet=True)
         cmds.pluginInfo('gpuCache.mll', edit=True, autoload=True)
+    if not cmds.pluginInfo('fbxmaya.mll', query=True, loaded=True):
+        cmds.loadPlugin('fbxmaya.mll', quiet=True)
+        cmds.pluginInfo('fbxmaya.mll', edit=True, autoload=True)
     if cmds.pluginInfo('Mayatomr.mll', query=True, loaded=True):
         cmds.unloadPlugin('Mayatomr.mll', force=True)
     cmds.setAttr("defaultRenderGlobals.imageFilePrefix", "frame", type='string')

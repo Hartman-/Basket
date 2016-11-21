@@ -210,6 +210,8 @@ def goUI():
     emitter.newasset.connect(appLaunch.goNewAsset)
     # emitter.renderscene.connect(appLaunch.renderScene)
 
+    os.environ['RMS_SCRIPT_PATHS'] = "%RMS_SCRIPT_PATHS%;X:/Classof2017/LobstersAreWeird/basket/renderman"
+
     sys.exit(app.exec_())
 
 
