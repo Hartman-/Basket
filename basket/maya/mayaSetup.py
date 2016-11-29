@@ -47,7 +47,7 @@ def createDirs(input):
 def writeLocalLog(path, message):
     txtpath = os.path.join(path, '_publishLog.txt')
     file = open(txtpath, 'a')
-    file.write(str(strftime("%d %B %Y %H:%M:%S")) + ' | ' + str(message) + ' | ' + getpass.getuser() + '\n')
+    file.write('\n' + str(strftime("%d %B %Y %H:%M:%S")) + ' | ' + str(message) + ' | ' + getpass.getuser())
     file.close()
 
 
@@ -79,7 +79,7 @@ def easy_iterate(*args):
         split = re.split(r'([vV]\d+)', fileName)
         version = int(split[1][1:])
         while not fileSaved:
-            newName = '%sv%02d%s' % (split[0], version, split[2])
+            newName = '%sv%02d_%s.ma' % (split[0], version, getpass.getuser())
             newPath = os.path.join(fileDir, newName)
             if os.path.isfile(newPath):
                 version += 1
@@ -124,27 +124,56 @@ def f_easySave(desc, ver=1):
 
 def asset_Publish(*args):
     var = cmds.promptDialog(
-        title='Publish Asset',
-        message='Asset Name:',
+        title='Publish Model',
+        message='Model Name:',
         button=['OK', 'Cancel'],
         defaultButton='OK',
         cancelButton='Cancel',
         dismissString='Cancel').replace(' ', '')
     if var == 'OK':
         desc = cmds.promptDialog(query=True, text=True)
-        # abcName = '%s_%s_%s.abc' % ('asset', desc, getpass.getuser())
-        fbxName = '%s_%s_%s.fbx' % ('asset', desc, getpass.getuser())
+        asciiName = '%s_%s_%s.ma' % ('asset', desc, 'published')
+        binaryName = '%s_%s_%s.mb' % ('asset', desc, 'published')
 
-        # fileAbc = os.path.join(config.libraryDir('models'), desc, abcName).replace('\\', '/')
-        fileFbx = os.path.join(config.libraryDir('models'), desc, fbxName).replace('\\', '/')
-        createDirs(fileFbx)
+        fileAscii = os.path.join(config.libraryDir('models'), desc, asciiName).replace('\\', '/')
+        fileBinary = os.path.join(config.libraryDir('models'), desc, binaryName).replace('\\', '/')
+        createDirs(fileAscii)
         selected = cmds.ls(selection=True)
         liststring = ''
         for i, o in enumerate(selected):
             liststring += '-root |'+str(o)+' '
-        # eval('AbcExport -j "-frameRange 1 1 -uvWrite -writeFaceSets -writeUVSets -dataFormat ogawa %s -file %s";' % (liststring, fileAbc))
-        cmds.file(fileFbx, exportSelected=True, type='FBX export')
-        writeLocalLog(os.path.dirname(fileFbx), os.path.basename(cmds.file(query=True, sceneName=True)))
+
+        cmds.file(fileAscii, exportSelected=True, constructionHistory=False, preserveReferences=True, type='mayaAscii')
+        cmds.file(fileBinary, exportSelected=True, constructionHistory=False, preserveReferences=True, type='mayaBinary')
+
+        writeLocalLog(os.path.dirname(fileAscii), os.path.basename(cmds.file(query=True, sceneName=True)))
+
+def rig_Publish(*args):
+    var = cmds.promptDialog(
+        title='Publish Rig',
+        message='Rig Name:',
+        button=['OK', 'Cancel'],
+        defaultButton='OK',
+        cancelButton='Cancel',
+        dismissString='Cancel').replace(' ', '')
+    if var == 'OK':
+        desc = cmds.promptDialog(query=True, text=True)
+        asciiName = '%s_%s_%s.ma' % ('rig', desc, 'published')
+        binaryName = '%s_%s_%s.mb' % ('rig', desc, 'published')
+
+        fileAscii = os.path.join(config.libraryDir('rig'), desc, asciiName).replace('\\', '/')
+        fileBinary = os.path.join(config.libraryDir('rig'), desc, binaryName).replace('\\', '/')
+        createDirs(fileAscii)
+        selected = cmds.ls(selection=True)
+
+        liststring = ''
+        for i, o in enumerate(selected):
+            liststring += '-root |'+str(o)+' '
+
+        cmds.file(fileAscii, exportSelected=True, constructionHistory=False, preserveReferences=True, type='mayaAscii')
+        cmds.file(fileBinary, exportSelected=True, constructionHistory=False, preserveReferences=True, type='mayaBinary')
+
+        writeLocalLog(os.path.dirname(fileAscii), os.path.basename(cmds.file(query=True, sceneName=True)))
 
 
 def asset_Import(*args):
@@ -425,7 +454,8 @@ def main():
 
     cmds.menuItem(divider=True, dividerLabel='Export')
     cmds.menuItem(label='Publish Scene', command=scene_Publish)
-    cmds.menuItem(label='Publish Asset', command=asset_Publish)
+    cmds.menuItem(label='Publish Model', command=asset_Publish)
+    cmds.menuItem(label='Publish Rig', command=rig_Publish)
 
     # cmds.menuItem(divider=True, dividerLabel='Submit')
     # cmds.menuItem(label='Submit to Qube')

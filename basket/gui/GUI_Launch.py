@@ -259,12 +259,10 @@ class WindowLayout(QTabWidget):
         self.text_Directory.setText(correctedPath)
 
     def launchAsset(self):
-        print 'And I grabbed her by the cat'
         if self.text_Directory.text() != '':
             self.openasset.emit(self.text_Directory.text())
 
     def launchNewAsset(self):
-        print 'CHINA'
         if self.text_AssetName.text() != '':
             self.newasset.emit(self.text_AssetName.text())
             self.text_AssetName.clear()

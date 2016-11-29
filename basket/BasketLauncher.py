@@ -123,7 +123,7 @@ class Launcher:
 
 class LocalizeProject:
     def __init__(self):
-        print 'I never said that.'
+        print 'Setting up Local Project Structure'
 
     def buildlocal(self):
         BasketBuilder.build_base_local()
