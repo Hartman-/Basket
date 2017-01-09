@@ -14,6 +14,7 @@ from PySide.QtGui import *
 import BasketGlobals as config
 import BasketBuilder
 import gui.GUI_Launch as LauncherGUI
+import utils.appconfig as appconfig
 
 
 class Launcher:
@@ -26,7 +27,7 @@ class Launcher:
             subprocess.Popen([appPath, '--nukex', filePath], creationflags=subprocess.CREATE_NEW_CONSOLE)
             return
         if appPath is config.applicationPath('.ma'):
-            subprocess.Popen([appPath, '-file', filePath, '-script', 'X:\\Classof2017\\LobstersAreWeird\\basket\\maya\\mayaLaunchCall.mel'])
+            subprocess.Popen([appPath, '-file', filePath, '-script', appconfig.get_config_value('app', 'parsepath')])
             return
         else:
             subprocess.Popen([appPath, filePath])
@@ -39,7 +40,7 @@ class Launcher:
             return
         # Maya Needs its special little MEL file
         if appPath is config.applicationPath('.ma'):
-            subprocess.Popen([appPath, '-script', 'X:\\Classof2017\\LobstersAreWeird\\basket\\maya\\mayaLaunchCall.mel'])
+            subprocess.Popen([appPath, '-script', appconfig.get_config_value('app', 'parsepath')])
             return
         # Houdini and Premiere are Chill AF
         else:
@@ -106,7 +107,7 @@ class Launcher:
     @Slot(int, str, str)
     def renderScene(self, stage, tag, cam):
         cmd = '"C:\\Program Files\\Autodesk\\Maya2016.5\\bin\\render.exe" -r rman'
-        project = ' -proj "\\\\awexpress.westphal.drexel.edu\digm_anfx\SRPJ_LAW"'
+        project = ' -proj %s' % appconfig.get_config_value('project', 'projdir')
         shadingRate = ' -setAttr ShadingRate 16'
 
         if cam != '':
@@ -121,6 +122,7 @@ class Launcher:
         # subprocess.Popen(render_cmd)
         # return
 
+
 class LocalizeProject:
     def __init__(self):
         print 'Setting up Local Project Structure'
@@ -132,6 +134,7 @@ class LocalizeProject:
 
 ''' BEGIN FUNCTION
 	Run the command line program, parse incoming arguments '''
+
 
 # Catch the initial input
 # User can choose to enter commandline mode if they want
@@ -210,7 +213,7 @@ def goUI():
     emitter.newasset.connect(appLaunch.goNewAsset)
     # emitter.renderscene.connect(appLaunch.renderScene)
 
-    os.environ['RMS_SCRIPT_PATHS'] = "%RMS_SCRIPT_PATHS%;X:/Classof2017/LobstersAreWeird/basket/renderman"
+    os.environ['RMS_SCRIPT_PATHS'] = appconfig.get_config_value('project', 'rmsworkspace')
 
     sys.exit(app.exec_())
 

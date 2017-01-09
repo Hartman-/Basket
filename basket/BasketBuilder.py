@@ -8,8 +8,8 @@ import BasketGlobals as config
 
 
 # SET THE BASE LOCATION
-SERVER = os.path.join(config.serverDir())
-LOCAL = os.path.join(config.rootDir())
+SERVER = config.serverDir()
+LOCAL = config.rootDir()
 
 
 # Basic 'Safe' Server Directory make
@@ -109,4 +109,4 @@ def rep_prod_dir():
 
 
 if __name__ == "__main__":
-    rep_prod_dir()
+    print next(os.walk(os.path.join(SERVER, 'working', 'scenes')))[1]
