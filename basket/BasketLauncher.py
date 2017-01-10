@@ -23,10 +23,11 @@ class Launcher:
         localize.buildlocal()
 
     def launch(self, appPath, filePath):
-        if appPath is config.applicationPath('.nk'):
+        if appPath == config.applicationPath('.nk'):
             subprocess.Popen([appPath, '--nukex', filePath], creationflags=subprocess.CREATE_NEW_CONSOLE)
             return
-        if appPath is config.applicationPath('.ma'):
+        if appPath == config.applicationPath('.ma'):
+            # appconfig.get_config_value('app', 'parsepath')
             subprocess.Popen([appPath, '-file', filePath, '-script', appconfig.get_config_value('app', 'parsepath')])
             return
         else:
@@ -35,15 +36,18 @@ class Launcher:
 
     def createNewFile(self, appPath):
         # NUKE is a Special Snowflake
-        if appPath is config.applicationPath('.nk'):
+        if appPath == config.applicationPath('.nk'):
+            print("Launching New Nuke File")
             subprocess.Popen([appPath, '--nukex'], creationflags=subprocess.CREATE_NEW_CONSOLE)
             return
         # Maya Needs its special little MEL file
-        if appPath is config.applicationPath('.ma'):
+        if appPath == config.applicationPath('.ma'):
+            print("Launching New Maya File")
             subprocess.Popen([appPath, '-script', appconfig.get_config_value('app', 'parsepath')])
             return
         # Houdini and Premiere are Chill AF
         else:
+            print("Launching New Houdini/Premiere File")
             subprocess.Popen(appPath)
             return
 
@@ -214,6 +218,7 @@ def goUI():
     # emitter.renderscene.connect(appLaunch.renderScene)
 
     os.environ['RMS_SCRIPT_PATHS'] = appconfig.get_config_value('project', 'rmsworkspace')
+    os.environ['RMSPROJ'] = appconfig.get_config_value('project', 'projdir')
 
     sys.exit(app.exec_())
 

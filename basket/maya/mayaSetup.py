@@ -23,6 +23,18 @@ def setProjectDirectory():
     cmds.workspace('\\\\awexpress.westphal.drexel.edu\\digm_anfx\\SRPJ_LAW', o=True)
 
 
+def setDefaultProject():
+    user = os.path.expanduser('~')
+    defaultdir = 'maya\projects\default'
+    projdir = os.path.join(user, defaultdir)
+    cmds.workspace(projdir, o=True)
+
+
+# Set the project back to default upon Maya exit
+# Prevents overwriting project settings when certain teammates forget to make a project for their class projects
+cmds.scriptJob(e=['quitApplication', setDefaultProject])
+
+
 def setupRenderEnvironment():
     if not cmds.pluginInfo('RenderMan_for_Maya.mll', query=True, loaded=True):
         cmds.loadPlugin('RenderMan_for_Maya.mll', quiet=True)
@@ -439,6 +451,8 @@ def render_Batch(*args):
 
 
 def main():
+    setProjectDirectory()
+
     cmds.menu(label='LAW', tearOff=True, parent='MayaWindow')
 
     # cmds.menuItem(divider=True, dividerLabel='Manage')
@@ -463,5 +477,4 @@ def main():
     cmds.menuItem(divider=True, dividerLabel='Render')
     cmds.menuItem(label='Generate Batch Script', command=render_Batch)
 
-    setProjectDirectory()
     setupRenderEnvironment()
