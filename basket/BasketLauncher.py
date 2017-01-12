@@ -28,7 +28,7 @@ class Launcher:
             return
         if appPath == config.applicationPath('.ma'):
             # appconfig.get_config_value('app', 'parsepath')
-            subprocess.Popen([appPath, '-file', filePath, '-script', appconfig.get_config_value('app', 'parsepath')])
+            subprocess.Popen([appPath, '-file', filePath, '-proj', appconfig.get_config_value('project', 'projdir'), '-script', appconfig.get_config_value('app', 'parsepath')])
             return
         else:
             subprocess.Popen([appPath, filePath])
@@ -43,7 +43,7 @@ class Launcher:
         # Maya Needs its special little MEL file
         if appPath == config.applicationPath('.ma'):
             print("Launching New Maya File")
-            subprocess.Popen([appPath, '-script', appconfig.get_config_value('app', 'parsepath')])
+            subprocess.Popen([appPath, '-proj', appconfig.get_config_value('project', 'projdir'), '-script', appconfig.get_config_value('app', 'parsepath')])
             return
         # Houdini and Premiere are Chill AF
         else:
@@ -218,7 +218,6 @@ def goUI():
     # emitter.renderscene.connect(appLaunch.renderScene)
 
     os.environ['RMS_SCRIPT_PATHS'] = appconfig.get_config_value('project', 'rmsworkspace')
-    os.environ['RMSPROJ'] = appconfig.get_config_value('project', 'projdir')
 
     sys.exit(app.exec_())
 
