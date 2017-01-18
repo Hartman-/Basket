@@ -27,6 +27,8 @@ seqFiles = getSequence()
 
 # GRAB THE RIGHT MOST DIGIT IN THE FIRST FRAME'S FILE NAME
 firstString = re.findall( r'\d+', seqFiles[0] )[-1]
+print seqFiles
+print 'first: %s' % seqFiles[0]
 # GET THE PADDING FROM THE AMOUNT OF DIGITS
 padding = len( firstString )
 # CREATE PADDING STRING FRO SEQUENCE NOTATION
@@ -49,8 +51,8 @@ writePath = os.path.join(dirPath, writeName).replace('\\', '/')
 print 'First Frame: %s' % firstFrame
 print 'Last Frame: %s' % lastFrame
 
-print 'Read: %s' % filePath
-print 'Write: %s' % writePath
+# print 'Read: %s' % filePath
+# print 'Write: %s' % writePath
 
 
 # NUKE Nodes

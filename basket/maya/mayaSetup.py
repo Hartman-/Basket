@@ -90,12 +90,22 @@ def easy_iterate(*args):
         # Get the number
         split = re.split(r'([vV]\d+)', fileName)
         version = int(split[1][1:])
+        split[1] = 'v%02d' % (version + 1)
         while not fileSaved:
-            newName = '%sv%02d_%s.ma' % (split[0], version, getpass.getuser())
+            newVer = ''.join(split)
+
+            sp = newVer.split('_')
+            name, ext = os.path.splitext(sp[len(sp) - 1])
+            sp[len(sp)-1] = '%s%s' % (getpass.getuser(), ext)
+
+            newName = '_'.join(sp)
+
             newPath = os.path.join(fileDir, newName)
+
             if os.path.isfile(newPath):
                 version += 1
                 continue
+
             cmds.file(rename=newPath)
             cmds.file(save=True, type='mayaAscii')
             fileSaved = True
@@ -170,8 +180,8 @@ def rig_Publish(*args):
         dismissString='Cancel').replace(' ', '')
     if var == 'OK':
         desc = cmds.promptDialog(query=True, text=True)
-        asciiName = '%s_%s_%s.ma' % ('rig', desc, 'published')
-        binaryName = '%s_%s_%s.mb' % ('rig', desc, 'published')
+        asciiName = '%s_%s_%s.ma' % ('rig', desc, 'publish')
+        binaryName = '%s_%s_%s.mb' % ('rig', desc, 'publish')
 
         fileAscii = os.path.join(config.libraryDir('rig'), desc, asciiName).replace('\\', '/')
         fileBinary = os.path.join(config.libraryDir('rig'), desc, binaryName).replace('\\', '/')
@@ -451,6 +461,7 @@ def render_Batch(*args):
 
 
 def main():
+    print(" - - - - - - HELLO THIS IS IAN - - - - - - ")
     setProjectDirectory()
 
     cmds.menu(label='LAW', tearOff=True, parent='MayaWindow')

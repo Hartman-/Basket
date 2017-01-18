@@ -55,7 +55,7 @@ class ArchiveDialog(QDialog):
             subprocess.Popen(['C:\Program Files\Nuke10.0v4\Nuke10.0.exe',
                    '--nukex',
                    '-ti',
-                   'X:/Classof2017/LobstersAreWeird/basket/nuke/convertsequence.py',
+                   'C:/Users/imh29/Desktop/Basket/basket/nuke/convertsequence.py',
                    path])
 
 if __name__ == "__main__":

@@ -1,2 +1,3 @@
 python("import mayaSetup");
 python("mayaSetup.main()");
+python("print('THIS IS REALLY LARGE TEXT')");

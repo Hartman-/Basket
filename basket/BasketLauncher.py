@@ -28,7 +28,7 @@ class Launcher:
             return
         if appPath == config.applicationPath('.ma'):
             # appconfig.get_config_value('app', 'parsepath')
-            subprocess.Popen([appPath, '-file', filePath, '-proj', appconfig.get_config_value('project', 'projdir'), '-script', appconfig.get_config_value('app', 'parsepath')])
+            subprocess.Popen([appPath, '-file', filePath, '-proj', appconfig.get_config_value('project', 'projdir'), '-script', r'\\awexpress.westphal.drexel.edu\digm_share\Classof2017\LobstersAreWeird\basket\maya\mayaLaunchCall.mel'])
             return
         else:
             subprocess.Popen([appPath, filePath])
