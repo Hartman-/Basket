@@ -191,12 +191,6 @@ nuke.toNode("BurnIn").knob("disable").setValue(False)
 
     n_burnInGroup.begin()
 
-    def getFrameHeight():
-        return int(nukeRoot.format().height())
-
-    def getFrameWidth():
-        return int(nukeRoot.format().width())
-
     k_CtrlTab = nuke.Tab_Knob('Controls')
     k_CtrlAuthor = nuke.String_Knob('author', 'author')
     k_CtrlAuthor.setValue('Ian Hartman')
@@ -252,7 +246,7 @@ nuke.toNode("BurnIn").knob("disable").setValue(False)
                           n_frameCounter.textNode)
 
     n_fileName = TextNode('Filename',
-                          "[string trimleft [string trim [value root.name] .nk] [file dirname [value root.name]]]",
+                          "[python {os.path.splitext(os.path.basename(nuke.root().knob('name').value()))[0]}]",
                           False,
                           30,
                           [0, 'root.height - 100', rootWidth, rootHeight],

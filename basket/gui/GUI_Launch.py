@@ -311,6 +311,8 @@ class WindowLayout(QTabWidget):
         sort = []
         for i, n in enumerate(files):
             # Add all found file variables to a list
+            filename, ext = os.path.splitext(n)
+            print ext
             splt = os.path.basename(n).split('_')
             if len(splt) >= 2:
                 sort.append(splt[2])

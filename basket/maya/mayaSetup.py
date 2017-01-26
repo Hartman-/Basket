@@ -192,8 +192,8 @@ def rig_Publish(*args):
         for i, o in enumerate(selected):
             liststring += '-root |'+str(o)+' '
 
-        cmds.file(fileAscii, exportSelected=True, constructionHistory=False, preserveReferences=True, type='mayaAscii')
-        cmds.file(fileBinary, exportSelected=True, constructionHistory=False, preserveReferences=True, type='mayaBinary')
+        cmds.file(fileAscii, exportSelected=True, preserveReferences=True, type='mayaAscii')
+        cmds.file(fileBinary, exportSelected=True, preserveReferences=True, type='mayaBinary')
 
         writeLocalLog(os.path.dirname(fileAscii), os.path.basename(cmds.file(query=True, sceneName=True)))
 
@@ -253,11 +253,11 @@ def scene_Publish(*args):
     filePath = cmds.file(query=True, sceneName=True)
     fileName = os.path.basename(filePath)
     split = fileName.split('_')
-    newName = '%s_%s_%s_%s.ma' % (split[0], split[1], split[4], split[5])
+    stages = ['previs', 'layout', 'anim', 'fx', 'lighting', 'render']
+    newName = '%s_%s_%s_%s.ma' % (os.getenv("SEQ"), os.getenv("SHOT"),  stages[int(os.environ['LAWSTAGE'])], 'publish')
     while not fileSaved:
         mayaPath = os.path.join(config.publishDir(config.stageNum()), newName)
-        cmds.file(rename=mayaPath)
-        cmds.file(save=True, type='mayaAscii')
+        cmds.file(mayaPath, exportAll=True, type='mayaAscii')
         writeLocalLog(os.path.dirname(mayaPath), fileName)
         fileSaved = True
     return mayaPath

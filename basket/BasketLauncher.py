@@ -43,7 +43,7 @@ class Launcher:
         # Maya Needs its special little MEL file
         if appPath == config.applicationPath('.ma'):
             print("Launching New Maya File")
-            subprocess.Popen([appPath, '-proj', appconfig.get_config_value('project', 'projdir'), '-script', appconfig.get_config_value('app', 'parsepath')])
+            subprocess.Popen([appPath, '-proj', appconfig.get_config_value('project', 'projdir'), '-script', r'\\awexpress.westphal.drexel.edu\digm_share\Classof2017\LobstersAreWeird\basket\maya\mayaLaunchCall.mel'])
             return
         # Houdini and Premiere are Chill AF
         else:
