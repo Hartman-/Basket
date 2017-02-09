@@ -29,7 +29,7 @@ class Launcher:
             return
         if appPath == config.applicationPath('.ma'):
             # appconfig.get_config_value('app', 'parsepath')
-            print("Launching Maya File for %s - %s (%s)" % (os.environ['SEQ'], os.environ['SHOT'], config.STAGE_DIRS[config.stageNum()]))
+            # print("Launching Maya File for %s - %s (%s)" % (os.environ['SEQ'], os.environ['SHOT'], config.STAGE_DIRS[config.stageNum()]))
             subprocess.Popen([appPath, '-file', filePath, '-proj', appconfig.get_config_value('project', 'projdir'), '-script', r'\\awexpress.westphal.drexel.edu\digm_share\Classof2017\LobstersAreWeird\basket\maya\mayaLaunchCall.mel'])
             return
         else:
