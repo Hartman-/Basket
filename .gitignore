@@ -11,6 +11,7 @@
 *.egg
 *.egg-info
 build
+dist
 eggs
 parts
 var
@@ -19,6 +20,9 @@ develop-eggs
 .installed.cfg
 lib
 lib64
+
+# Virtual Environment
+venv
 
 # Installer logs
 pip-log.txt
