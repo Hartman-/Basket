@@ -45,6 +45,12 @@ def setupRenderEnvironment():
     if not cmds.pluginInfo('fbxmaya.mll', query=True, loaded=True):
         cmds.loadPlugin('fbxmaya.mll', quiet=True)
         cmds.pluginInfo('fbxmaya.mll', edit=True, autoload=True)
+    if not cmds.pluginInfo('AbcExport.mll', query=True, loaded=True):
+        cmds.loadPlugin('AbcExport.mll', quiet=True)
+        cmds.pluginInfo('AbcExport.mll', edit=True, autoload=True)
+    if not cmds.pluginInfo('AbcImport.mll', query=True, loaded=True):
+        cmds.loadPlugin('AbcImport.mll', quiet=True)
+        cmds.pluginInfo('AbcImport.mll', edit=True, autoload=True)
     if cmds.pluginInfo('Mayatomr.mll', query=True, loaded=True):
         cmds.unloadPlugin('Mayatomr.mll', force=True)
     cmds.setAttr("defaultRenderGlobals.imageFilePrefix", "frame", type='string')
@@ -59,7 +65,7 @@ def createDirs(input):
 def writeLocalLog(path, message):
     txtpath = os.path.join(path, '_publishLog.txt')
     file = open(txtpath, 'a')
-    file.write('\n' + str(strftime("%d %B %Y %H:%M:%S")) + ' | ' + str(message) + ' | ' + getpass.getuser())
+    file.write('\n' + str(strftime("%d %B %Y %H:%M:%S")) + ' | ' + str(message) + ' | ' + getpass.getuser() + '\n')
     file.close()
 
 
@@ -257,7 +263,21 @@ def scene_Publish(*args):
     newName = '%s_%s_%s_%s.ma' % (os.getenv("SEQ"), os.getenv("SHOT"),  stages[int(os.environ['LAWSTAGE'])], 'publish')
     while not fileSaved:
         mayaPath = os.path.join(config.publishDir(config.stageNum()), newName)
-        cmds.file(mayaPath, exportAll=True, type='mayaAscii')
+        cmds.file(mayaPath, exportAll=True, type='mayaAscii', preserveReferences=True)
+        writeLocalLog(os.path.dirname(mayaPath), fileName)
+        fileSaved = True
+    return mayaPath
+
+
+def anim_Publish(*args):
+    fileSaved = False
+    filePath = cmds.file(query=True, sceneName=True)
+    fileName = os.path.basename(filePath)
+    split = fileName.split('_')
+    newName = '%s_%s_%s_%s.ma' % (os.getenv("SEQ"), os.getenv("SHOT"),  'anim', 'publish')
+    while not fileSaved:
+        mayaPath = os.path.join(config.publishDir(config.stageNum()), newName)
+        cmds.file(mayaPath, exportSelected=True, type='mayaAscii', preserveReferences=True)
         writeLocalLog(os.path.dirname(mayaPath), fileName)
         fileSaved = True
     return mayaPath
@@ -461,7 +481,7 @@ def render_Batch(*args):
 
 
 def main():
-    print(" - - - - - - HELLO THIS IS IAN - - - - - - ")
+    print(" - - - LAW Toolset Loaded - - - ")
     setProjectDirectory()
 
     cmds.menu(label='LAW', tearOff=True, parent='MayaWindow')
@@ -478,8 +498,9 @@ def main():
     cmds.menuItem(label='Reference Stage', command=scene_Reference)
 
     cmds.menuItem(divider=True, dividerLabel='Export')
-    cmds.menuItem(label='Publish Scene', command=scene_Publish)
-    cmds.menuItem(label='Publish Model', command=asset_Publish)
+    cmds.menuItem(label='Publish Layout', command=scene_Publish)
+    cmds.menuItem(label='Publish Animation', command=anim_Publish)
+    cmds.menuItem(label='Publish Asset', command=asset_Publish)
     cmds.menuItem(label='Publish Rig', command=rig_Publish)
 
     # cmds.menuItem(divider=True, dividerLabel='Submit')
