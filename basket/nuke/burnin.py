@@ -82,7 +82,7 @@ class TextNode:
 
         self.height = int(nuke.root().height())
 
-        if (Alt == True):
+        if Alt is True:
             self.textNode[textString].setValue(self.Message)
             self.textNode['message'].setValue('[python {nuke.thisNode()["' + textString + '"].getValue()}]')
         else:
@@ -95,18 +95,18 @@ class TextNode:
 
         SSPMacPath = '/Library/Fonts/SourceSansPro-Regular.otf'
         SSPWinPath = '{}/Windows/Fonts/SourceSansPro-Regular.otf'.format(winDrive)
-        if (nuke.env["WIN32"] == True):
+        if nuke.env["WIN32"] is True:
             OS = 'Win'
             winDrive = os.environ['SYSTEMDRIVE']
             SSPPath = SSPWinPath
-        if (nuke.env["MACOS"] == True):
+        if nuke.env["MACOS"] is True:
             OS = 'Mac'
             SSPPath = SSPMacPath
 
         self.textNode['font'].setValue(SSPPath)
 
         # Make sure the comments don't push up into the rest of the slate
-        if (self.Name == 'SlateComment'):
+        if self.Name is 'SlateComment':
             self.textNode['yjustify'].setValue('top')
 
         # if (self.Resize == True):
@@ -125,13 +125,13 @@ def dropBurnIn():
     # Define Variables
     nukeRoot = nuke.root()
 
-    rootWidth = 'root.width'
-    rootHeight = 'root.height'
+    rootWidth = 'input.width'
+    rootHeight = 'input.height'
 
-    zeroWidth = 'root.width - root.width'
-    zeroHeight = 'root.height - root.height'
+    zeroWidth = 'input.width - input.width'
+    zeroHeight = 'input.height - input.height'
 
-    halfWidth = 'root.width / 2'
+    halfWidth = 'input.width / 2'
 
     proj_Format = nukeRoot.format()
     proj_Comments = nukeRoot['label'].getValue()
@@ -206,7 +206,7 @@ nuke.toNode("BurnIn").knob("disable").setValue(False)
 
     # Build Rectangle Overlays
     n_topRect = RectNode('TopOverlay',
-                         [zeroWidth, 'root.height - 100', rootWidth, rootHeight],
+                         [zeroWidth, 'input.height - 100', rootWidth, rootHeight],
                          0,
                          0.5,
                          False,
@@ -222,7 +222,7 @@ nuke.toNode("BurnIn").knob("disable").setValue(False)
     #                     'Drexel University',
     #                     False,
     #                     30,
-    #                     [25, 'root.height- 100,' rootWidth, 'root.height,
+    #                     [25, 'input.height- 100,' rootWidth, 'input.height,
     ''#                     False,
     #                     'left',
     #                     n_botRect.rectNode)
@@ -231,7 +231,7 @@ nuke.toNode("BurnIn").knob("disable").setValue(False)
                               '[python {int(burnin.curnormframe(nuke.root().knob("first_frame").value()))}]/[python {int(burnin.normframerange(nuke.root().knob("first_frame").value(),nuke.root().knob("last_frame").value())[1])}] ([python {nuke.frame()}])',
                               False,
                               30,
-                              ['root.width - 200', zeroHeight, rootWidth, 100],
+                              ['input.width - 200', zeroHeight, rootWidth, 100],
                               False,
                               'center',
                               n_botRect.rectNode)
@@ -249,7 +249,7 @@ nuke.toNode("BurnIn").knob("disable").setValue(False)
                           "[python {os.path.splitext(os.path.basename(nuke.root().knob('name').value()))[0]}]",
                           False,
                           30,
-                          [0, 'root.height - 100', rootWidth, rootHeight],
+                          [0, 'input.height - 100', rootWidth, rootHeight],
                           False,
                           'center',
                           n_shotName.textNode)
@@ -264,7 +264,7 @@ nuke.toNode("BurnIn").knob("disable").setValue(False)
                             n_fileName.textNode)
 
     n_Rect = RectNode('pRect',
-                      [25, zeroHeight, rootWidth, 'root.height - 100'],
+                      [25, zeroHeight, rootWidth, 'input.height - 100'],
                       0,
                       0,
                       False,
@@ -274,7 +274,7 @@ nuke.toNode("BurnIn").knob("disable").setValue(False)
     #                           'Drexel University',
     #                           False,
     #                           50,
-    #                           [0, 'root.height- 100,' rootWidth, 'root.height,
+    #                           [0, 'input.height- 100,' rootWidth, 'input.height,
     ''#                           False,
     #                           'center',
     #                           None)
@@ -283,7 +283,7 @@ nuke.toNode("BurnIn").knob("disable").setValue(False)
                            'Date: [date %D] [date %T]',
                            False,
                            50,
-                           [zeroWidth, 'root.height - 100', halfWidth, rootHeight],
+                           [zeroWidth, 'input.height - 100', halfWidth, rootHeight],
                            True,
                            'left',
                            None)
@@ -292,7 +292,7 @@ nuke.toNode("BurnIn").knob("disable").setValue(False)
                                'Author: ',
                                False,
                                50,
-                               [zeroWidth, 'root.height - 200', halfWidth, 'root.height - 100'],
+                               [zeroWidth, 'input.height - 200', halfWidth, 'input.height - 100'],
                                True,
                                'left',
                                n_localTime.textNode)
@@ -301,7 +301,7 @@ nuke.toNode("BurnIn").knob("disable").setValue(False)
                              '[python {nuke.toNode("BurnIn").knob("author").getValue()}]',
                              True,
                              50,
-                             [175, 'root.height - 200', halfWidth, 'root.height - 100'],
+                             [175, 'input.height - 200', halfWidth, 'input.height - 100'],
                              True,
                              'left',
                              n_slateAuthor_t.textNode)
@@ -310,7 +310,7 @@ nuke.toNode("BurnIn").knob("disable").setValue(False)
                              'Format: [python {nuke.root().format().name()}]',
                              True,
                              50,
-                             [zeroWidth, 'root.height - 300', halfWidth, 'root.height - 200'],
+                             [zeroWidth, 'input.height - 300', halfWidth, 'input.height - 200'],
                              True,
                              'left',
                              n_slateAuthor.textNode)
@@ -319,7 +319,7 @@ nuke.toNode("BurnIn").knob("disable").setValue(False)
                            'Shot: [python {nuke.toNode("BurnIn").knob("shot").getValue()}]',
                            False,
                            50,
-                           [zeroWidth, 'root.height - 400', halfWidth, 'root.height - 300'],
+                           [zeroWidth, 'input.height - 400', halfWidth, 'input.height - 300'],
                            True,
                            'left',
                            n_slateFormat.textNode)
@@ -328,7 +328,7 @@ nuke.toNode("BurnIn").knob("disable").setValue(False)
                             '[python {int(nuke.root().knob("first_frame").value())}] - [python {int(nuke.root().knob("last_frame").value())}]',
                             True,
                             50,
-                            [zeroWidth, 'root.height - 500', halfWidth, 'root.height - 400'],
+                            [zeroWidth, 'input.height - 500', halfWidth, 'input.height - 400'],
                             True,
                             'left',
                             n_slateShot.textNode)
@@ -337,7 +337,7 @@ nuke.toNode("BurnIn").knob("disable").setValue(False)
                                    'Comments: ',
                                    False,
                                    50,
-                                   [halfWidth, 'root.height - 150', rootWidth, 'root.height - 50'],
+                                   [halfWidth, 'input.height - 150', rootWidth, 'input.height - 50'],
                                    False,
                                    'left',
                                    n_slateRange.textNode)
@@ -346,7 +346,7 @@ nuke.toNode("BurnIn").knob("disable").setValue(False)
                               '[python {nuke.toNode("BurnIn").knob("notes").getValue()}]',
                               False,
                               50,
-                              [halfWidth, 'root.height - 150', rootWidth, 'root.height - 250'],
+                              [halfWidth, 'input.height - 150', rootWidth, 'input.height - 250'],
                               False,
                               'left',
                               n_slateCommentTitle.textNode)

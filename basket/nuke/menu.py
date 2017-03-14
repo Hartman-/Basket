@@ -80,6 +80,7 @@ nuke.addOnScriptSave(proj_Manager.checkScriptName)
 
 setupMenu()
 
+
 def savelocalscript():
     if not os.path.isdir(config.nukeDir()):
         print('what do?')
@@ -88,6 +89,7 @@ def savelocalscript():
         desc = nkName.split('_')[2]
         fileVersion = int(re.search(r'[vV]\d+', os.path.split(nkName)[1]).group().lstrip('vV'))
         proj_Manager.s_easySave(desc, ver=fileVersion)
+
 
 def saveserverscript():
     if not os.path.isdir(config.nukeDir()):

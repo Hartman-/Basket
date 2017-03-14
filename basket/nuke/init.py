@@ -1,9 +1,13 @@
-def setupDefault():
-    # DEFINE EXAMPLE ENVIRONMENT
-    os.environ['SEQ'] = 'abc'
-    os.environ['SHOT'] = '010'
+import getpass
+import os
 
-if os.getenv('SEQ') is None or os.getenv('SHOT') is None:
-    setupDefault()
+nuke.tprint("hello world, dis ethan")
 
+user = str(getpass.getuser())
+userPath = os.path.join("W:\\SRPJ_LAW\\nuke\\user\\", user)
+if os.path.isdir(userPath):
+    nuke.pluginAddPath( userPath )
 
+showPath = "W:\\SRPJ_LAW\\nuke\\show\\HONU"
+if os.path.isdir(showPath):
+    nuke.pluginAddPath(showPath)
