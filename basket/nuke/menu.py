@@ -36,10 +36,11 @@ def setProject():
 
 def createUI(name):
     nuke.menu('Nuke').addCommand(name + '/Easy Save', proj_Manager.easySave)
+    nuke.menu('Nuke').addCommand(name + '/Create Batch Scripts', proj_Manager.createBatchScripts)
     nuke.addFavoriteDir(
-    name='NUKE Scripts',
-    directory=config.nukeDir(),
-    type=nuke.SCRIPT)
+        name='NUKE Scripts',
+        directory=config.nukeDir(),
+        type=nuke.SCRIPT)
     nuke.addFavoriteDir(
         name='NUKE Sequences',
         directory=os.path.join(config.framesDir(), os.getenv('SEQ'), os.getenv('SHOT')),

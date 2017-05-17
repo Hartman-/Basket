@@ -75,7 +75,6 @@ class WindowLayout(QTabWidget):
         for i_stage, t_stage in enumerate(config.STAGE_DIRS):
             self.dropdown_stage.addItem(t_stage)
 
-
         # MISC LAYOUT
         vbox_tag = QVBoxLayout()
         vbox_tag.addWidget(self.label_tag)
@@ -285,7 +284,7 @@ class WindowLayout(QTabWidget):
         config.setSeq(self.dropdown_scene.currentText())
         self.dropdown_shot.clear()
         if os.getenv('SEQ') != '':
-            for i_shot, t_shot in enumerate(next(os.walk(os.path.join(config.serverDir(), 'working', 'scenes', os.getenv('SEQ'))))[1]):
+            for i_shot, t_shot in enumerate(sorted(next(os.walk(os.path.join(config.serverDir(), 'working', 'scenes', os.getenv('SEQ'))))[1])):
                 self.dropdown_shot.addItem(t_shot)
             config.setShot(self.dropdown_shot.currentText())
             self.updateTags()

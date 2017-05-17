@@ -81,12 +81,12 @@ class Launcher:
             # if the tag exists in the file name, it returns a number
             # if it doesnt' exist, returns -1
         else:
-            newest = max(glob.iglob(os.path.join(config.stageDir(stage), filetypes[stage])), key=os.path.getctime)
-        return newest
+            newest = max(glob.iglob(os.path.join(config.stageDir(stage), filetypes[stage])), key=os.path.getmtime)
+        return [newest, os.path.getmtime(newest)]
 
     @Slot(int, str)
     def goLaunch(self, stage, tag):
-        self.launch(config.applicationPath(stage), self.latestfile(stage, tag))
+        self.launch(config.applicationPath(stage), self.latestfile(stage, tag)[0])
 
     @Slot(int)
     def goNewFile(self, stage):
@@ -121,7 +121,7 @@ class Launcher:
         else:
             camera = ''
 
-        file = ' "%s"' % self.latestfile(stage, tag)
+        file = ' "%s"' % self.latestfile(stage, tag)[0]
 
         render_cmd = '%s%s%s%s%s' % (cmd, project, shadingRate, camera, file)
         print render_cmd
@@ -200,7 +200,7 @@ def initialize():
 
     basketLaunch.launch(
         config.applicationPath(args.stage),
-        basketLaunch.latestfile(args.stage, args.tag)
+        basketLaunch.latestfile(args.stage, args.tag)[0]
     )
 
 

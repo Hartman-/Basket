@@ -1,8 +1,6 @@
 import getpass
 import os
 
-nuke.tprint("hello world, dis ethan")
-
 user = str(getpass.getuser())
 userPath = os.path.join("W:\\SRPJ_LAW\\nuke\\user\\", user)
 if os.path.isdir(userPath):
